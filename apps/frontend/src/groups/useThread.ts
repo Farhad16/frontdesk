@@ -15,6 +15,7 @@ interface IThreadState {
   sending: boolean
   send: (text: string) => Promise<void>
   sendRequest: (input: ISendRequestInput) => Promise<void>
+  sendQuick: (quickActionKey: string) => Promise<void>
   updateStatus: (messageId: string, status: Status) => Promise<void>
 }
 
@@ -86,6 +87,16 @@ export function useThread(groupKey: string): IThreadState {
     [groupKey],
   )
 
+  const sendQuick = useCallback(
+    async (quickActionKey: string) => {
+      const message = await apiClient.post<IMessage>(`/groups/${groupKey}/messages/quick`, {
+        quickActionKey,
+      })
+      setMessages(prev => upsert(prev, message))
+    },
+    [groupKey],
+  )
+
   const updateStatus = useCallback(
     async (messageId: string, status: Status) => {
       const result = await apiClient.patch<IStatusUpdateResult>(
@@ -97,5 +108,5 @@ export function useThread(groupKey: string): IThreadState {
     [groupKey],
   )
 
-  return {messages, loading, error, sending, send, sendRequest, updateStatus}
+  return {messages, loading, error, sending, send, sendRequest, sendQuick, updateStatus}
 }

@@ -4,6 +4,7 @@ import {CurrentUser} from '../auth/decorators/current-user.decorator'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import type {AuthUser} from '../auth/jwt.strategy'
 import {SendMessageDto} from './dto/message.dto'
+import {QuickActionDto} from './dto/quick.dto'
 import {CreateRequestDto} from './dto/request.dto'
 import {UpdateStatusDto} from './dto/status.dto'
 import {MessagesService} from './messages.service'
@@ -34,6 +35,15 @@ export class MessagesController {
     @Body() dto: CreateRequestDto,
   ): Promise<IMessage> {
     return this.messages.createRequest(key, user.id, dto)
+  }
+
+  @Post('quick')
+  createQuick(
+    @Param('key') key: string,
+    @CurrentUser() user: AuthUser,
+    @Body() dto: QuickActionDto,
+  ): Promise<IMessage> {
+    return this.messages.createQuick(key, user, dto.quickActionKey)
   }
 
   @Patch(':id/status')

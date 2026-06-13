@@ -83,6 +83,34 @@
   }
 }
 
+.fdQuickRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--fd-space) * 0.75);
+  padding: calc(var(--fd-space) * 1.25) calc(var(--fd-space) * 1.5) 0;
+}
+
+.fdQuickBtn {
+  padding: calc(var(--fd-space) * 0.5) var(--fd-space);
+  border: 1px solid color-mix(in srgb, var(--fd-primary), transparent 55%);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 92%);
+  color: var(--fd-primary);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 85%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
 .fdComposer {
   display: flex;
   gap: var(--fd-space);

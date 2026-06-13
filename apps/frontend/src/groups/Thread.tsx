@@ -14,12 +14,19 @@ export function Thread() {
   const {key = ''} = useParams()
   const {user} = useAuth()
   const config = useGroupConfig(key)
-  const {messages, loading, error, sending, send, sendRequest, updateStatus} = useThread(key)
+  const {messages, loading, error, sending, send, sendRequest, sendQuick, updateStatus} =
+    useThread(key)
   const [draft, setDraft] = useState('')
   const [builderOpen, setBuilderOpen] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
 
   const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
+  const quickActions = (config?.quickActions ?? []).filter(
+    action =>
+      action.messageKey &&
+      !action.opensDatePicker &&
+      (!action.visibleToRole || action.visibleToRole === user?.role),
+  )
 
   useEffect(() => {
     bodyRef.current?.scrollTo({top: bodyRef.current.scrollHeight})
@@ -74,6 +81,22 @@ export function Thread() {
           )
         })}
       </div>
+
+      {quickActions.length > 0 && (
+        <div className={styles.fdQuickRow}>
+          {quickActions.map(action => (
+            <button
+              key={action.key}
+              type="button"
+              className={styles.fdQuickBtn}
+              disabled={sending}
+              onClick={() => void sendQuick(action.key)}
+            >
+              {t(`quick.${action.key}`)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <form className={styles.fdComposer} onSubmit={handleSubmit}>
         {hasCatalog && (

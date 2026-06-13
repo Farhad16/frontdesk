@@ -94,7 +94,11 @@ export function MessageBubble({
               })()}
           </div>
         ) : (
-          <span className={styles.fdText}>{message.text ?? message.summary}</span>
+          <span className={styles.fdText}>
+            {message.type === 'QUICK' && message.text
+              ? t(message.text)
+              : (message.text ?? message.summary)}
+          </span>
         )}
 
         <span className={styles.fdTime}>{formatTime(message.createdAt)}</span>

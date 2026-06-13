@@ -47,6 +47,11 @@ export const en = {
   'thread.staffTag': 'Staff',
   'thread.loadError': 'Could not load messages.',
 
+  'lunch.msg.offToday': 'Today my lunch will be off',
+  'lunch.msg.prompt': "Please let me know if you want to stop today's lunch",
+  'quick.offToday': '🚫 Stop today',
+  'quick.prompt': '📢 Ask: stopping lunch?',
+
   'cat.drinks': 'Drinks',
   'cat.snacks': 'Snacks',
   'cat.assistance': 'Help',

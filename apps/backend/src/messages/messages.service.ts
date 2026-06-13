@@ -58,6 +58,27 @@ export class MessagesService {
     return mapped
   }
 
+  async createQuick(
+    groupKey: string,
+    actor: {id: string; role: Role},
+    quickActionKey: string,
+  ): Promise<IMessage> {
+    const group = await this.requireGroup(groupKey)
+    const action = GROUP_CONFIGS[groupKey]?.quickActions.find(item => item.key === quickActionKey)
+    if (!action || !action.messageKey) throw new BadRequestException('Unknown quick action')
+    if (action.visibleToRole && action.visibleToRole !== actor.role) {
+      throw new ForbiddenException('Quick action not available for your role')
+    }
+    const message = await this.prisma.message.create({
+      data: {groupId: group.id, senderId: actor.id, type: 'QUICK', text: action.messageKey},
+      include: {sender: true},
+    })
+    const mapped = toMessage(message)
+    this.events.emit({type: 'message:new', groupKey, message: mapped})
+    void this.push.notifyNewMessage(actor.id, groupKey, mapped)
+    return mapped
+  }
+
   async createRequest(groupKey: string, senderId: string, dto: CreateRequestDto): Promise<IMessage> {
     const group = await this.requireGroup(groupKey)
     const tracksStatus = GROUP_CONFIGS[groupKey]?.statusTracking ?? false
