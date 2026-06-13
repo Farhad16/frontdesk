@@ -4,7 +4,9 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
 import {MessageBubble} from './MessageBubble'
+import {RequestBuilder} from './RequestBuilder'
 import {dayKey, dayLabel} from './threadFormat'
+import {useGroupConfig} from './useGroupConfig'
 import {useGroups} from './useGroups'
 import {useThread} from './useThread'
 import styles from './Thread.module.css'
@@ -14,11 +16,14 @@ export function Thread() {
   const navigate = useNavigate()
   const {user} = useAuth()
   const {groups} = useGroups()
-  const {messages, loading, error, sending, send} = useThread(key)
+  const config = useGroupConfig(key)
+  const {messages, loading, error, sending, send, sendRequest} = useThread(key)
   const [draft, setDraft] = useState('')
+  const [builderOpen, setBuilderOpen] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
 
   const group = groups.find(item => item.key === key)
+  const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
 
   useEffect(() => {
     bodyRef.current?.scrollTo({top: bodyRef.current.scrollHeight})
@@ -83,6 +88,16 @@ export function Thread() {
       </div>
 
       <form className={styles.fdComposer} onSubmit={handleSubmit}>
+        {hasCatalog && (
+          <WuButton
+            type="button"
+            variant="iconOnly"
+            className={styles.fdComposerAdd}
+            Icon={<span aria-hidden="true">＋</span>}
+            aria-label={t('builder.newRequest')}
+            onClick={() => setBuilderOpen(true)}
+          />
+        )}
         <WuInput
           variant="outlined"
           type="text"
@@ -94,6 +109,15 @@ export function Thread() {
           {t('thread.send')}
         </WuButton>
       </form>
+
+      {builderOpen && config && (
+        <RequestBuilder
+          config={config}
+          sending={sending}
+          onClose={() => setBuilderOpen(false)}
+          onSend={sendRequest}
+        />
+      )}
     </div>
   )
 }

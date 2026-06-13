@@ -1,0 +1,170 @@
+.fdBuilderOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgb(0 0 0 / 0.4);
+}
+
+.fdBuilder {
+  display: flex;
+  width: 100%;
+  max-height: 90vh;
+  flex-direction: column;
+  background: var(--fd-bg);
+  border-radius: calc(var(--fd-radius) * 2) calc(var(--fd-radius) * 2) 0 0;
+}
+
+@media (min-width: 48rem) {
+  .fdBuilderOverlay {
+    align-items: center;
+  }
+
+  .fdBuilder {
+    max-width: 32rem;
+    max-height: 85vh;
+    border-radius: calc(var(--fd-radius) * 2);
+  }
+}
+
+.fdBuilderBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+}
+
+.fdBuilderTitle {
+  font-size: var(--fd-font);
+  font-weight: 700;
+}
+
+.fdBuilderBody {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 2);
+  overflow-y: auto;
+  padding: calc(var(--fd-space) * 2);
+}
+
+.fdBuilderPick {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.75);
+}
+
+.fdBuilderLabel {
+  color: color-mix(in srgb, var(--fd-text), transparent 20%);
+  font-size: calc(var(--fd-font) * 0.82);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fdOptionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--fd-space) * 0.75);
+}
+
+.fdOption {
+  padding: calc(var(--fd-space) * 0.6) calc(var(--fd-space) * 1.25);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-bg);
+  color: var(--fd-text);
+  font-size: calc(var(--fd-font) * 0.93);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--fd-primary), var(--fd-border) 40%);
+  }
+}
+
+.fdOptionOn {
+  border-color: var(--fd-primary);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  color: var(--fd-primary);
+  font-weight: 600;
+}
+
+.fdInline {
+  display: flex;
+  gap: var(--fd-space);
+  align-items: center;
+
+  > :first-child {
+    flex: 1;
+  }
+}
+
+.fdStepper {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: calc(var(--fd-space) * 1.5);
+  padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 1.25);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+
+  button {
+    border: 0;
+    background: none;
+    color: var(--fd-primary);
+    font-size: calc(var(--fd-font) * 1.2);
+    cursor: pointer;
+  }
+}
+
+.fdAddItem {
+  align-self: flex-start;
+}
+
+.fdCart {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fdCartLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
+  border-radius: var(--fd-radius);
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 0.93);
+
+  button {
+    flex-shrink: 0;
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--fd-text), transparent 30%);
+    cursor: pointer;
+  }
+}
+
+.fdCartEmpty {
+  margin: 0;
+  color: color-mix(in srgb, var(--fd-text), transparent 40%);
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
+.fdBuilderFoot {
+  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2);
+  border-top: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+}
+
+.fdSend {
+  width: 100%;
+}

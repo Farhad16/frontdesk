@@ -1,6 +1,12 @@
-import type {IMessage} from '@frontdesk/types'
+import type {IMessage, IRequestPayload} from '@frontdesk/types'
 import {useCallback, useEffect, useState} from 'react'
 import {apiClient} from '../lib/apiClient'
+
+export interface ISendRequestInput {
+  items: IRequestPayload['items']
+  note?: string
+  summary: string
+}
 
 interface IThreadState {
   messages: IMessage[]
@@ -8,6 +14,7 @@ interface IThreadState {
   error: string | null
   sending: boolean
   send: (text: string) => Promise<void>
+  sendRequest: (input: ISendRequestInput) => Promise<void>
 }
 
 export function useThread(groupKey: string): IThreadState {
@@ -43,5 +50,21 @@ export function useThread(groupKey: string): IThreadState {
     [groupKey],
   )
 
-  return {messages, loading, error, sending, send}
+  const sendRequest = useCallback(
+    async (input: ISendRequestInput) => {
+      setSending(true)
+      try {
+        const message = await apiClient.post<IMessage>(
+          `/groups/${groupKey}/messages/request`,
+          input,
+        )
+        setMessages(prev => [...prev, message])
+      } finally {
+        setSending(false)
+      }
+    },
+    [groupKey],
+  )
+
+  return {messages, loading, error, sending, send, sendRequest}
 }
