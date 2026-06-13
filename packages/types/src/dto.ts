@@ -80,10 +80,18 @@ export interface IOAuthProfile {
   photoUrl?: string
   providerId: string
 }
+export interface IGroupLastMessage {
+  type: MessageType
+  text?: string
+  summary?: string
+  senderName: string
+  createdAt: string
+}
 export interface IGroupSummary {
   key: string
   nameKey: string
   emoji: string
+  lastMessage?: IGroupLastMessage
 }
 export interface IPushSubscriptionInput {
   endpoint: string

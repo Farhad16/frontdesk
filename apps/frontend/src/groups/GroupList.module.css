@@ -65,9 +65,17 @@
 
 .fdGroupText {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: calc(var(--fd-space) * 0.25);
   min-width: 0;
+}
+
+.fdGroupTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--fd-space);
 }
 
 .fdGroupName {
@@ -76,10 +84,31 @@
   font-weight: 600;
 }
 
+.fdGroupTime {
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--fd-text), transparent 45%);
+  font-size: calc(var(--fd-font) * 0.72);
+}
+
+.fdGroupBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+}
+
 .fdGroupPreview {
   overflow: hidden;
   color: color-mix(in srgb, var(--fd-text), transparent 40%);
   font-size: calc(var(--fd-font) * 0.86);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fdGroupDot {
+  width: calc(var(--fd-space) * 1);
+  height: calc(var(--fd-space) * 1);
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--fd-primary);
 }

@@ -13,6 +13,18 @@ export function dayKey(iso: string): string {
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
 }
 
+export function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime()
+  const diffMin = Math.floor((Date.now() - then) / 60000)
+  if (diffMin < 1) return 'now'
+  if (diffMin < 60) return `${diffMin}m`
+  const diffHr = Math.floor(diffMin / 60)
+  if (diffHr < 24) return `${diffHr}h`
+  const diffDay = Math.floor(diffHr / 24)
+  if (diffDay < 7) return `${diffDay}d`
+  return new Date(iso).toLocaleDateString([], {day: 'numeric', month: 'short'})
+}
+
 export function dayLabel(iso: string): string {
   const date = new Date(iso)
   const today = dayStart(new Date())

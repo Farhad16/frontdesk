@@ -9,7 +9,7 @@ export class GroupsController {
   constructor(private readonly groups: GroupsService) {}
 
   @Get()
-  list(): IGroupSummary[] {
+  list(): Promise<IGroupSummary[]> {
     return this.groups.list()
   }
 

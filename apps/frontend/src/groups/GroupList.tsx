@@ -1,13 +1,29 @@
+import type {IGroupLastMessage} from '@frontdesk/types'
 import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
-import {useState} from 'react'
+import {useEffect, useReducer, useState} from 'react'
 import {NavLink} from 'react-router-dom'
 import {t} from '../i18n'
+import {getGroupReadAt, subscribeReads} from '../lib/reads'
 import styles from './GroupList.module.css'
+import {relativeTime} from './threadFormat'
 import {useGroups} from './useGroups'
+
+function previewText(last: IGroupLastMessage): string {
+  const body =
+    last.type === 'REQUEST'
+      ? (last.summary ?? '')
+      : last.type === 'QUICK' && last.text
+        ? t(last.text)
+        : (last.text ?? last.summary ?? '')
+  return `${last.senderName}: ${body}`
+}
 
 export function GroupList() {
   const {groups, loading, error} = useGroups()
   const [query, setQuery] = useState('')
+  const [, bump] = useReducer((n: number) => n + 1, 0)
+
+  useEffect(() => subscribeReads(bump), [])
 
   const visible = groups.filter(group =>
     t(group.nameKey).toLowerCase().includes(query.trim().toLowerCase()),
@@ -38,23 +54,36 @@ export function GroupList() {
       )}
 
       <nav className={styles.fdGroupItems}>
-        {visible.map(group => (
-          <NavLink
-            key={group.key}
-            to={`/groups/${group.key}`}
-            className={({isActive}) =>
-              isActive ? `${styles.fdGroupItem} ${styles.fdGroupItemActive}` : styles.fdGroupItem
-            }
-          >
-            <span className={styles.fdGroupEmoji} aria-hidden="true">
-              {group.emoji}
-            </span>
-            <span className={styles.fdGroupText}>
-              <span className={styles.fdGroupName}>{t(group.nameKey)}</span>
-              <span className={styles.fdGroupPreview}>{t('groups.noMessages')}</span>
-            </span>
-          </NavLink>
-        ))}
+        {visible.map(group => {
+          const last = group.lastMessage
+          const readAt = getGroupReadAt(group.key)
+          const unread = Boolean(last && (!readAt || last.createdAt > readAt))
+          return (
+            <NavLink
+              key={group.key}
+              to={`/groups/${group.key}`}
+              className={({isActive}) =>
+                isActive ? `${styles.fdGroupItem} ${styles.fdGroupItemActive}` : styles.fdGroupItem
+              }
+            >
+              <span className={styles.fdGroupEmoji} aria-hidden="true">
+                {group.emoji}
+              </span>
+              <span className={styles.fdGroupText}>
+                <span className={styles.fdGroupTop}>
+                  <span className={styles.fdGroupName}>{t(group.nameKey)}</span>
+                  {last && <span className={styles.fdGroupTime}>{relativeTime(last.createdAt)}</span>}
+                </span>
+                <span className={styles.fdGroupBottom}>
+                  <span className={styles.fdGroupPreview}>
+                    {last ? previewText(last) : t('groups.noMessages')}
+                  </span>
+                  {unread && <span className={styles.fdGroupDot} aria-label="unread" />}
+                </span>
+              </span>
+            </NavLink>
+          )
+        })}
       </nav>
     </div>
   )

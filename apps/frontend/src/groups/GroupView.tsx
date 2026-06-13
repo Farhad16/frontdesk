@@ -1,9 +1,10 @@
 import {WuButton} from '@npm-questionpro/wick-ui-lib'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {ViewToggle} from '../components/ViewToggle'
 import {t} from '../i18n'
+import {markGroupRead} from '../lib/reads'
 import {getViewMode, setViewMode, type ViewMode} from '../lib/viewMode'
 import {QueueView} from '../queue/QueueView'
 import styles from './GroupView.module.css'
@@ -16,6 +17,10 @@ export function GroupView() {
   const {user} = useAuth()
   const {groups} = useGroups()
   const [mode, setMode] = useState<ViewMode>(() => getViewMode(user?.role))
+
+  useEffect(() => {
+    if (key) markGroupRead(key)
+  }, [key])
 
   const group = groups.find(item => item.key === key)
 
