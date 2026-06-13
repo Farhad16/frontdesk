@@ -46,6 +46,8 @@ export const en = {
   'thread.send': 'Send',
   'thread.staffTag': 'Staff',
   'thread.loadError': 'Could not load messages.',
+  'thread.deleted': '🚫 This message was deleted',
+  'thread.delete': 'Delete',
 
   'lunch.msg.offToday': 'Today my lunch will be off',
   'lunch.msg.prompt': "Please let me know if you want to stop today's lunch",

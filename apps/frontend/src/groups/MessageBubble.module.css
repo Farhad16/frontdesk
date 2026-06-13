@@ -154,8 +154,34 @@
   }
 }
 
+.fdMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fd-space);
+  margin-top: calc(var(--fd-space) * 0.25);
+}
+
 .fdTime {
-  align-self: flex-end;
   color: color-mix(in srgb, var(--fd-text), transparent 45%);
   font-size: calc(var(--fd-font) * 0.72);
+}
+
+.fdDelete {
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--fd-error), transparent 20%);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.72);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.fdTombstone {
+  color: color-mix(in srgb, var(--fd-text), transparent 45%);
+  font-size: calc(var(--fd-font) * 0.86);
+  font-style: italic;
 }

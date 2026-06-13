@@ -7,6 +7,7 @@ interface IQueueState {
   loading: boolean
   error: string | null
   updateStatus: (groupKey: string, messageId: string, status: Status) => Promise<void>
+  deleteMessage: (groupKey: string, messageId: string) => Promise<void>
 }
 
 function upsert(list: IRequestQueueItem[], item: IRequestQueueItem): IRequestQueueItem[] {
@@ -40,6 +41,8 @@ export function useQueue(): IQueueState {
       if (data.type === 'message:new' || data.type === 'message:status') {
         if (data.message.type !== 'REQUEST') return
         setItems(prev => upsert(prev, {groupKey: data.groupKey, message: data.message}))
+      } else if (data.type === 'message:deleted') {
+        setItems(prev => prev.filter(entry => entry.message.id !== data.messageId))
       }
     }
     return () => source.close()
@@ -56,5 +59,10 @@ export function useQueue(): IQueueState {
     [],
   )
 
-  return {items, loading, error, updateStatus}
+  const deleteMessage = useCallback(async (groupKey: string, messageId: string) => {
+    await apiClient.delete(`/groups/${groupKey}/messages/${messageId}`)
+    setItems(prev => prev.filter(entry => entry.message.id !== messageId))
+  }, [])
+
+  return {items, loading, error, updateStatus, deleteMessage}
 }

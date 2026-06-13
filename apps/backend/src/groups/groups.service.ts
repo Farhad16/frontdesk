@@ -9,7 +9,12 @@ export class GroupsService {
   async list(): Promise<IGroupSummary[]> {
     const groups = await this.prisma.group.findMany({
       include: {
-        messages: {orderBy: {createdAt: 'desc'}, take: 1, include: {sender: true}},
+        messages: {
+          where: {deletedAt: null},
+          orderBy: {createdAt: 'desc'},
+          take: 1,
+          include: {sender: true},
+        },
       },
     })
     const byKey = new Map(groups.map(group => [group.key, group]))

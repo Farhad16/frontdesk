@@ -186,7 +186,21 @@
 .fdActionsCell {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: calc(var(--fd-space) * 0.5);
+}
+
+.fdRowDelete {
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--fd-error), transparent 20%);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.79);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 /* Mobile: each row becomes a stacked card with inline labels. */

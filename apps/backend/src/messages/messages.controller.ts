@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Param, Patch, Post, UseGuards} from '@nestjs/common'
+import {Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards} from '@nestjs/common'
 import type {IMessage, IStatusUpdateResult} from '@frontdesk/types'
 import {CurrentUser} from '../auth/decorators/current-user.decorator'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
@@ -44,6 +44,16 @@ export class MessagesController {
     @Body() dto: QuickActionDto,
   ): Promise<IMessage> {
     return this.messages.createQuick(key, user, dto.quickActionKey)
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(
+    @Param('key') key: string,
+    @Param('id') id: string,
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    return this.messages.deleteMessage(key, id, user)
   }
 
   @Patch(':id/status')

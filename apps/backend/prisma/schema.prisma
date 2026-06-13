@@ -84,10 +84,12 @@ model Message {
   type      MessageType @default(TEXT)
   text      String?
   payload   Json?
-  status    Status?
-  summary   String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  status      Status?
+  summary     String?
+  deletedAt   DateTime?
+  deletedById String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([groupId, createdAt])
 }

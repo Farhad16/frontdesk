@@ -10,14 +10,17 @@ interface IQueueRowProps {
   currentUserId?: string
   currentRole?: Role
   onUpdateStatus: (groupKey: string, messageId: string, status: Status) => void
+  onDelete: (groupKey: string, messageId: string) => void
 }
 
-export function QueueRow({item, currentUserId, currentRole, onUpdateStatus}: IQueueRowProps) {
+export function QueueRow({item, currentUserId, currentRole, onUpdateStatus, onDelete}: IQueueRowProps) {
   const {message, groupKey} = item
   const actions =
     message.status && currentRole
       ? actionsFor(message.status, currentRole, message.sender.id === currentUserId)
       : []
+  const canDelete =
+    currentRole === 'STAFF' && (message.status === 'DONE' || message.status === 'CANCELLED')
 
   return (
     <div className={styles.fdRow}>
@@ -51,6 +54,15 @@ export function QueueRow({item, currentUserId, currentRole, onUpdateStatus}: IQu
             {action.label}
           </WuButton>
         ))}
+        {canDelete && (
+          <button
+            type="button"
+            className={styles.fdRowDelete}
+            onClick={() => onDelete(groupKey, message.id)}
+          >
+            {t('thread.delete')}
+          </button>
+        )}
       </span>
     </div>
   )

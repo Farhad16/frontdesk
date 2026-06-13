@@ -17,6 +17,7 @@ interface IThreadState {
   sendRequest: (input: ISendRequestInput) => Promise<void>
   sendQuick: (quickActionKey: string) => Promise<void>
   updateStatus: (messageId: string, status: Status) => Promise<void>
+  deleteMessage: (messageId: string) => Promise<void>
 }
 
 function upsert(list: IMessage[], message: IMessage): IMessage[] {
@@ -55,7 +56,13 @@ export function useThread(groupKey: string): IThreadState {
       if (data.type === 'message:new' || data.type === 'message:status') {
         setMessages(prev => upsert(prev, data.message))
       } else if (data.type === 'message:deleted') {
-        setMessages(prev => prev.filter(message => message.id !== data.messageId))
+        setMessages(prev =>
+          prev.map(message =>
+            message.id === data.messageId
+              ? {...message, deletedAt: new Date().toISOString()}
+              : message,
+          ),
+        )
       }
     }
     return () => source.close()
@@ -108,5 +115,27 @@ export function useThread(groupKey: string): IThreadState {
     [groupKey],
   )
 
-  return {messages, loading, error, sending, send, sendRequest, sendQuick, updateStatus}
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      await apiClient.delete(`/groups/${groupKey}/messages/${messageId}`)
+      setMessages(prev =>
+        prev.map(message =>
+          message.id === messageId ? {...message, deletedAt: new Date().toISOString()} : message,
+        ),
+      )
+    },
+    [groupKey],
+  )
+
+  return {
+    messages,
+    loading,
+    error,
+    sending,
+    send,
+    sendRequest,
+    sendQuick,
+    updateStatus,
+    deleteMessage,
+  }
 }

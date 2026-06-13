@@ -21,6 +21,7 @@ interface IMessageBubbleProps {
   currentUserId?: string
   currentRole?: Role
   onUpdateStatus: (messageId: string, status: Status) => void
+  onDelete?: (messageId: string) => void
 }
 
 export function MessageBubble({
@@ -29,6 +30,7 @@ export function MessageBubble({
   currentUserId,
   currentRole,
   onUpdateStatus,
+  onDelete,
 }: IMessageBubbleProps) {
   if (message.type === 'SYSTEM') {
     return (
@@ -40,6 +42,25 @@ export function MessageBubble({
 
   const initial = message.sender.name.charAt(0).toUpperCase()
   const showSender = !isOwn
+
+  if (message.deletedAt) {
+    return (
+      <div className={isOwn ? `${styles.fdRow} ${styles.fdRowOwn}` : styles.fdRow}>
+        {showSender && (
+          <span className={styles.fdRowAvatar} aria-hidden="true">
+            {initial}
+          </span>
+        )}
+        <div className={`${styles.fdBubble} ${styles.fdTombstone}`}>{t('thread.deleted')}</div>
+      </div>
+    )
+  }
+
+  const staffClosable =
+    currentRole === 'STAFF' &&
+    message.type === 'REQUEST' &&
+    (message.status === 'DONE' || message.status === 'CANCELLED')
+  const canDelete = onDelete && (message.sender.id === currentUserId || staffClosable)
 
   return (
     <div className={isOwn ? `${styles.fdRow} ${styles.fdRowOwn}` : styles.fdRow}>
@@ -101,7 +122,18 @@ export function MessageBubble({
           </span>
         )}
 
-        <span className={styles.fdTime}>{formatTime(message.createdAt)}</span>
+        <span className={styles.fdMeta}>
+          {canDelete && (
+            <button
+              type="button"
+              className={styles.fdDelete}
+              onClick={() => onDelete?.(message.id)}
+            >
+              {t('thread.delete')}
+            </button>
+          )}
+          <span className={styles.fdTime}>{formatTime(message.createdAt)}</span>
+        </span>
       </div>
     </div>
   )

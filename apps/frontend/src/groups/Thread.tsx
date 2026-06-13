@@ -12,7 +12,7 @@ import styles from './Thread.module.css'
 export function Thread() {
   const {key = ''} = useParams()
   const {user} = useAuth()
-  const {messages, loading, error, updateStatus} = useThread(key)
+  const {messages, loading, error, updateStatus, deleteMessage} = useThread(key)
   const bodyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -51,6 +51,7 @@ export function Thread() {
                 currentUserId={user?.id}
                 currentRole={user?.role}
                 onUpdateStatus={updateStatus}
+                onDelete={deleteMessage}
               />
             </Fragment>
           )

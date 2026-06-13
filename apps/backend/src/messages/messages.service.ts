@@ -101,11 +101,37 @@ export class MessagesService {
 
   async listRequests(): Promise<IRequestQueueItem[]> {
     const messages = await this.prisma.message.findMany({
-      where: {type: 'REQUEST'},
+      where: {type: 'REQUEST', deletedAt: null},
       orderBy: {createdAt: 'desc'},
       include: {sender: true, group: true},
     })
     return messages.map(message => ({groupKey: message.group.key, message: toMessage(message)}))
+  }
+
+  async deleteMessage(
+    groupKey: string,
+    messageId: string,
+    actor: {id: string; role: Role},
+  ): Promise<void> {
+    const group = await this.requireGroup(groupKey)
+    const message = await this.prisma.message.findUnique({where: {id: messageId}})
+    if (!message || message.groupId !== group.id) throw new NotFoundException('Message not found')
+    if (message.deletedAt) return
+
+    const isAuthor = message.senderId === actor.id
+    const isStaffClosable =
+      actor.role === 'STAFF' &&
+      message.type === 'REQUEST' &&
+      (message.status === 'DONE' || message.status === 'CANCELLED')
+    if (!isAuthor && !isStaffClosable) {
+      throw new ForbiddenException('Not allowed to delete this message')
+    }
+
+    await this.prisma.message.update({
+      where: {id: messageId},
+      data: {deletedAt: new Date(), deletedById: actor.id},
+    })
+    this.events.emit({type: 'message:deleted', groupKey, messageId})
   }
 
   async updateStatus(
@@ -194,7 +220,7 @@ function toMessage(message: MessageWithSender): IMessage {
     payload: (message.payload as IMessagePayload | null) ?? undefined,
     status: message.status ?? undefined,
     summary: message.summary ?? undefined,
-    deletedAt: null,
+    deletedAt: message.deletedAt ? message.deletedAt.toISOString() : null,
     createdAt: message.createdAt.toISOString(),
     updatedAt: message.updatedAt.toISOString(),
   }

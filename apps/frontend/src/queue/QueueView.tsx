@@ -17,7 +17,7 @@ export function QueueView() {
   const {key = ''} = useParams()
   const {user} = useAuth()
   const config = useGroupConfig(key)
-  const {items, loading, error, updateStatus} = useQueue()
+  const {items, loading, error, updateStatus, deleteMessage} = useQueue()
   const [status, setStatus] = useState<Status | 'ALL'>('ALL')
   const [name, setName] = useState('')
   const [todayOnly, setTodayOnly] = useState(false)
@@ -98,6 +98,7 @@ export function QueueView() {
                 currentUserId={user?.id}
                 currentRole={user?.role}
                 onUpdateStatus={updateStatus}
+                onDelete={deleteMessage}
               />
             ))}
           </div>
