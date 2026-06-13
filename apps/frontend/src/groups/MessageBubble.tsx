@@ -1,5 +1,4 @@
 import type {IMessage, IRequestPayload, Role, Status} from '@frontdesk/types'
-import {WuButton} from '@npm-questionpro/wick-ui-lib'
 import {t} from '../i18n'
 import {actionsFor} from './statusActions'
 import {formatTime} from './threadFormat'
@@ -7,6 +6,13 @@ import styles from './MessageBubble.module.css'
 
 function isRequestPayload(payload: IMessage['payload']): payload is IRequestPayload {
   return Boolean(payload && 'items' in payload)
+}
+
+const ACTION_GLYPH: Record<Status, string> = {
+  PENDING: '',
+  IN_PROGRESS: '▸',
+  DONE: '✓',
+  CANCELLED: '✕',
 }
 
 interface IMessageBubbleProps {
@@ -57,37 +63,31 @@ export function MessageBubble({
 
         {message.type === 'REQUEST' && isRequestPayload(message.payload) ? (
           <div className={styles.fdRequest}>
-            {message.summary && <span className={styles.fdRequestSummary}>{message.summary}</span>}
             {message.payload.items.map((item, index) => (
               <span key={index} className={styles.fdRequestLine}>
                 {item.summary ?? `${item.quantity} × ${item.item}`}
               </span>
             ))}
-            {message.status && (
-              <span className={styles.fdStatus} data-status={message.status.toLowerCase()}>
-                {t(`status.${message.status.toLowerCase()}`)}
-              </span>
-            )}
             {message.status &&
-              currentRole &&
               (() => {
-                const actions = actionsFor(
-                  message.status,
-                  currentRole,
-                  message.sender.id === currentUserId,
-                )
-                if (actions.length === 0) return null
+                const actions = currentRole
+                  ? actionsFor(message.status, currentRole, message.sender.id === currentUserId)
+                  : []
                 return (
-                  <div className={styles.fdActions}>
+                  <div className={styles.fdRequestFooter}>
+                    <span className={styles.fdStatus} data-status={message.status.toLowerCase()}>
+                      {t(`status.${message.status.toLowerCase()}`)}
+                    </span>
                     {actions.map(action => (
-                      <WuButton
+                      <button
                         key={action.next}
-                        size="sm"
-                        variant={action.primary ? 'primary' : 'outline'}
+                        type="button"
+                        className={styles.fdActionBtn}
+                        data-next={action.next.toLowerCase()}
                         onClick={() => onUpdateStatus(message.id, action.next)}
                       >
-                        {action.label}
-                      </WuButton>
+                        {ACTION_GLYPH[action.next]} {action.label}
+                      </button>
                     ))}
                   </div>
                 )

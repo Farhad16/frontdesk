@@ -1,4 +1,4 @@
-import type {IGroupSummary, IRequestQueueItem, Role, Status} from '@frontdesk/types'
+import type {IRequestQueueItem, Role, Status} from '@frontdesk/types'
 import {WuButton} from '@npm-questionpro/wick-ui-lib'
 import {actionsFor} from '../groups/statusActions'
 import {formatTime} from '../groups/threadFormat'
@@ -7,13 +7,12 @@ import styles from './QueuePage.module.css'
 
 interface IQueueRowProps {
   item: IRequestQueueItem
-  group?: IGroupSummary
   currentUserId?: string
   currentRole?: Role
   onUpdateStatus: (groupKey: string, messageId: string, status: Status) => void
 }
 
-export function QueueRow({item, group, currentUserId, currentRole, onUpdateStatus}: IQueueRowProps) {
+export function QueueRow({item, currentUserId, currentRole, onUpdateStatus}: IQueueRowProps) {
   const {message, groupKey} = item
   const actions =
     message.status && currentRole
@@ -27,9 +26,6 @@ export function QueueRow({item, group, currentUserId, currentRole, onUpdateStatu
           {message.sender.name.charAt(0).toUpperCase()}
         </span>
         {message.sender.name}
-      </span>
-      <span className={styles.fdGroupCell} data-label={t('queue.colGroup')}>
-        {group ? `${group.emoji} ${t(group.nameKey)}` : groupKey}
       </span>
       <span className={styles.fdRequest} data-label={t('queue.colRequest')}>
         {message.summary}

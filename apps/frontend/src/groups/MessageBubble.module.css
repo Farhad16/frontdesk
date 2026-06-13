@@ -90,9 +90,15 @@
   font-size: calc(var(--fd-font) * 0.93);
 }
 
+.fdRequestFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  margin-top: calc(var(--fd-space) * 0.5);
+}
+
 .fdStatus {
-  align-self: flex-start;
-  margin-top: calc(var(--fd-space) * 0.4);
   padding: calc(var(--fd-space) * 0.25) calc(var(--fd-space) * 0.75);
   border-radius: var(--fd-radius);
   font-size: calc(var(--fd-font) * 0.79);
@@ -119,10 +125,33 @@
   }
 }
 
-.fdActions {
-  display: flex;
-  gap: calc(var(--fd-space) * 0.75);
-  margin-top: calc(var(--fd-space) * 0.5);
+.fdActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.35);
+  padding: calc(var(--fd-space) * 0.3) calc(var(--fd-space) * 0.85);
+  border: 1px solid color-mix(in srgb, var(--fd-primary), transparent 55%);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: none;
+  color: var(--fd-primary);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.79);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-primary), transparent 88%);
+  }
+
+  &[data-next='cancelled'] {
+    border-color: color-mix(in srgb, var(--fd-error), transparent 55%);
+    color: var(--fd-error);
+
+    &:hover {
+      background: color-mix(in srgb, var(--fd-error), transparent 88%);
+    }
+  }
 }
 
 .fdTime {

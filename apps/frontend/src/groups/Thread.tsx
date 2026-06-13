@@ -1,28 +1,24 @@
 import {WuButton, WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
 import {Fragment, useEffect, useRef, useState, type FormEvent} from 'react'
-import {useNavigate, useParams} from 'react-router-dom'
+import {useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
 import {MessageBubble} from './MessageBubble'
 import {RequestBuilder} from './RequestBuilder'
 import {dayKey, dayLabel} from './threadFormat'
 import {useGroupConfig} from './useGroupConfig'
-import {useGroups} from './useGroups'
 import {useThread} from './useThread'
 import styles from './Thread.module.css'
 
 export function Thread() {
   const {key = ''} = useParams()
-  const navigate = useNavigate()
   const {user} = useAuth()
-  const {groups} = useGroups()
   const config = useGroupConfig(key)
   const {messages, loading, error, sending, send, sendRequest, updateStatus} = useThread(key)
   const [draft, setDraft] = useState('')
   const [builderOpen, setBuilderOpen] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
 
-  const group = groups.find(item => item.key === key)
   const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
 
   useEffect(() => {
@@ -45,20 +41,6 @@ export function Thread() {
 
   return (
     <div className={styles.fdThread}>
-      <header className={styles.fdThreadBar}>
-        <WuButton
-          variant="iconOnly"
-          className={styles.fdThreadBack}
-          Icon={<span aria-hidden="true">‹</span>}
-          aria-label={t('groups.back')}
-          onClick={() => navigate('/groups')}
-        />
-        <span className={styles.fdThreadEmoji} aria-hidden="true">
-          {group?.emoji}
-        </span>
-        <span className={styles.fdThreadName}>{group ? t(group.nameKey) : key}</span>
-      </header>
-
       <div ref={bodyRef} className={styles.fdThreadBody}>
         {loading && (
           <div className={styles.fdThreadState}>

@@ -1,0 +1,59 @@
+.fdGroupView {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.fdBar {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  background: var(--fd-bg);
+}
+
+.fdBack {
+  width: calc(var(--fd-space) * 3.5);
+  height: calc(var(--fd-space) * 3.5);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: calc(var(--fd-font) * 1.5);
+  line-height: 1;
+}
+
+@media (min-width: 48rem) {
+  .fdBack {
+    display: none;
+  }
+}
+
+.fdEmoji {
+  display: flex;
+  width: calc(var(--fd-space) * 4);
+  height: calc(var(--fd-space) * 4);
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 1.3);
+}
+
+.fdName {
+  font-size: var(--fd-font);
+  font-weight: 600;
+}
+
+.fdToggleSlot {
+  width: 13rem;
+  margin-left: auto;
+}
+
+.fdViewBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}

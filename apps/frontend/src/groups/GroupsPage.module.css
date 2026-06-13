@@ -83,7 +83,7 @@
 /* Tablet and up: two-pane layout, both always visible. */
 @media (min-width: 48rem) {
   .fdSidebar {
-    width: 20rem;
+    width: 15rem;
     border-right: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
   }
 
@@ -98,6 +98,6 @@
 
 @media (min-width: 64rem) {
   .fdSidebar {
-    width: 24rem;
+    width: 17rem;
   }
 }

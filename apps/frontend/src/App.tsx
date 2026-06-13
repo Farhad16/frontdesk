@@ -5,11 +5,9 @@ import {AuthPage} from './auth/AuthPage'
 import {useAuth} from './auth/AuthContext'
 import {GroupsEmpty} from './groups/GroupsEmpty'
 import {GroupsPage} from './groups/GroupsPage'
-import {Thread} from './groups/Thread'
+import {GroupView} from './groups/GroupView'
 import {useLanguage} from './i18n/LanguageContext'
 import type {Locale} from './i18n'
-import {getViewMode} from './lib/viewMode'
-import {QueueView} from './queue/QueueView'
 import {SettingsPage} from './settings/SettingsPage'
 
 export default function App() {
@@ -37,17 +35,14 @@ export default function App() {
 
   if (!user) return <AuthPage />
 
-  const home = getViewMode(user.role) === 'queue' ? '/groups/queue' : '/groups'
-
   return (
     <Routes>
       <Route path="/groups" element={<GroupsPage />}>
         <Route index element={<GroupsEmpty />} />
-        <Route path="queue" element={<QueueView />} />
-        <Route path=":key" element={<Thread />} />
+        <Route path=":key" element={<GroupView />} />
       </Route>
       <Route path="/settings" element={<SettingsPage />} />
-      <Route path="*" element={<Navigate to={home} replace />} />
+      <Route path="*" element={<Navigate to="/groups" replace />} />
     </Routes>
   )
 }

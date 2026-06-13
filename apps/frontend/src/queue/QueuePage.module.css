@@ -6,14 +6,57 @@
   background: var(--fd-surface);
 }
 
-.fdQueueToggle {
-  max-width: 18rem;
-  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2) 0;
+.fdQueueBar {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  background: var(--fd-bg);
+}
+
+.fdQueueBack {
+  width: calc(var(--fd-space) * 3.5);
+  height: calc(var(--fd-space) * 3.5);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: calc(var(--fd-font) * 1.5);
+  line-height: 1;
+}
+
+@media (min-width: 48rem) {
+  .fdQueueBack {
+    display: none;
+  }
+}
+
+.fdQueueEmoji {
+  display: flex;
+  width: calc(var(--fd-space) * 4);
+  height: calc(var(--fd-space) * 4);
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 1.3);
+}
+
+.fdQueueName {
+  font-size: var(--fd-font);
+  font-weight: 600;
+}
+
+.fdQueueToggleSlot {
+  width: 13rem;
+  margin-left: auto;
 }
 
 .fdQueueFilters {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--fd-space);
   padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2);
   border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
@@ -23,6 +66,7 @@
 .fdChips {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: calc(var(--fd-space) * 0.5);
 }
 
@@ -70,7 +114,7 @@
 
 .fdRow {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 2.2fr 0.7fr 1fr 1.4fr;
+  grid-template-columns: 1.1fr 3.6fr 0.6fr 0.9fr 0.9fr;
   gap: var(--fd-space);
   align-items: center;
   padding: var(--fd-space) calc(var(--fd-space) * 1.5);
@@ -109,9 +153,7 @@
 }
 
 .fdRequest {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .fdStatusChip {

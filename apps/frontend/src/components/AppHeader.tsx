@@ -3,7 +3,6 @@ import {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
-import {getViewMode} from '../lib/viewMode'
 import styles from './AppHeader.module.css'
 
 export function AppHeader() {
@@ -12,7 +11,7 @@ export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   function goHome() {
-    navigate(getViewMode(user?.role) === 'queue' ? '/groups/queue' : '/groups')
+    navigate('/groups')
   }
 
   return (

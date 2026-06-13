@@ -46,6 +46,11 @@
   font-weight: 600;
 }
 
+.fdThreadToggle {
+  width: 13rem;
+  margin-left: auto;
+}
+
 .fdThreadBody {
   display: flex;
   flex: 1;

@@ -1,8 +1,8 @@
 import type {Status} from '@frontdesk/types'
 import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
 import {useMemo, useState} from 'react'
+import {useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
-import {useGroups} from '../groups/useGroups'
 import {dayKey} from '../groups/threadFormat'
 import {t} from '../i18n'
 import {QueueRow} from './QueueRow'
@@ -12,11 +12,10 @@ import styles from './QueuePage.module.css'
 const STATUSES: Array<Status | 'ALL'> = ['ALL', 'PENDING', 'IN_PROGRESS', 'DONE', 'CANCELLED']
 
 export function QueueView() {
+  const {key = ''} = useParams()
   const {user} = useAuth()
-  const {groups} = useGroups()
   const {items, loading, error, updateStatus} = useQueue()
   const [status, setStatus] = useState<Status | 'ALL'>('ALL')
-  const [groupKey, setGroupKey] = useState('ALL')
   const [name, setName] = useState('')
   const [todayOnly, setTodayOnly] = useState(false)
 
@@ -24,14 +23,14 @@ export function QueueView() {
 
   const visible = useMemo(() => {
     return items.filter(item => {
+      if (item.groupKey !== key) return false
       if (status !== 'ALL' && item.message.status !== status) return false
-      if (groupKey !== 'ALL' && item.groupKey !== groupKey) return false
       if (todayOnly && dayKey(item.message.createdAt) !== todayKey) return false
       if (name.trim() && !item.message.sender.name.toLowerCase().includes(name.trim().toLowerCase()))
         return false
       return true
     })
-  }, [items, status, groupKey, name, todayOnly, todayKey])
+  }, [items, key, status, name, todayOnly, todayKey])
 
   return (
     <div className={styles.fdQueue}>
@@ -45,25 +44,6 @@ export function QueueView() {
               onClick={() => setStatus(value)}
             >
               {value === 'ALL' ? t('queue.filterAllStatus') : t(`status.${value.toLowerCase()}`)}
-            </button>
-          ))}
-        </div>
-        <div className={styles.fdChips}>
-          <button
-            type="button"
-            className={groupKey === 'ALL' ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
-            onClick={() => setGroupKey('ALL')}
-          >
-            {t('queue.filterAllGroups')}
-          </button>
-          {groups.map(group => (
-            <button
-              key={group.key}
-              type="button"
-              className={group.key === groupKey ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
-              onClick={() => setGroupKey(group.key)}
-            >
-              {group.emoji} {t(group.nameKey)}
             </button>
           ))}
           <button
@@ -100,7 +80,6 @@ export function QueueView() {
           <div className={styles.fdTable}>
             <div className={`${styles.fdRow} ${styles.fdHead}`}>
               <span>{t('queue.colMember')}</span>
-              <span>{t('queue.colGroup')}</span>
               <span>{t('queue.colRequest')}</span>
               <span>{t('queue.colTime')}</span>
               <span>{t('queue.colStatus')}</span>
@@ -110,7 +89,6 @@ export function QueueView() {
               <QueueRow
                 key={item.message.id}
                 item={item}
-                group={groups.find(group => group.key === item.groupKey)}
                 currentUserId={user?.id}
                 currentRole={user?.role}
                 onUpdateStatus={updateStatus}
