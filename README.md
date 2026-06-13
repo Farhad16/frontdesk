@@ -1,50 +1,76 @@
 # Frontdesk
 
-Internal office request & group system — a WhatsApp-style portal where staff get **instant
-phone push** the moment a request comes in. Built for the office hackathon (deadline **Mon 15
-Jun 9am**).
+Internal office request & group portal — a WhatsApp-style app where members place orders in
+group threads and staff fulfil them, with **live updates** and **web-push notifications**.
 
-> Status: **planning** — this folder currently holds the spec/plan docs for review. Code
-> scaffolding comes after sign-off.
+Three groups, each a thread with its own behaviour:
 
-## What it is
-A set of message groups (like WhatsApp groups), each a chat thread but with different behavior:
+- **Requests** — drinks / snacks / assistance via a tap-through order builder, with status tracking
+- **Breakfast** — food-menu builder (paratha, ruti, sides, egg) + free text
+- **Lunch** — one-tap "Stop my lunch" + lunch-off by date/range + free text
 
-- **Requests** — tea/coffee/supplies/assistance via a tap-through builder, with status tracking
-- **Breakfast** — food-menu builder (paratha/ruti, dal, egg) + free text
-- **Lunch** — one-tap "Stop today's lunch" + free text
-
-Flow: member posts → **staff get a push on their phone** → staff change status → member
-tracks it live.
+Flow: member places an order → **staff get a push** → staff move it `pending → in progress → done`
+→ member tracks it **live** (SSE), and gets a push when it's done.
 
 ## Tech stack
-- **Monorepo:** Turborepo + pnpm
-- **Frontend:** React + Vite + PWA (`vite-plugin-pwa`, one service worker)
-- **UI kit:** **@npm-questionpro/wick-ui-lib** components + **wick-ui-icon** (`wm-*`) + wick-ui
-  theme/`--wu-*` tokens
-- **Styling:** **CSS Modules** (`X.module.css`) + design tokens + modern native nesting (≤3
-  levels). **No Tailwind, no hardcoded values.**
+
+- **Monorepo:** Turborepo + pnpm (`apps/backend`, `apps/frontend`, `packages/types`)
 - **Backend:** NestJS + Prisma + PostgreSQL
-- **Push:** Web Push (VAPID) — self-hosted, no cloud
-- **Realtime:** SSE (Nest `@Sse()`)
+- **Frontend:** React + Vite + react-router + PWA (`vite-plugin-pwa`, one service worker)
+- **UI:** `@npm-questionpro/wick-ui-lib` components + `--fd-*` design tokens (CSS Modules, no Tailwind)
+- **Realtime:** SSE (Nest `@Sse()`); **Push:** self-hosted Web Push (VAPID)
 - **Edge:** nginx single origin; cloudflared opt-in tunnel for phone HTTPS
-- **Run:** `docker compose up` (single command)
 
-## Docs (read in this order)
-0. [`CLAUDE.md`](CLAUDE.md) — **start here**: project map, hard rules, conventions, build entry
-1. [`docs/features/`](docs/features/README.md) — **one file per feature** (add/delete to change scope); registry + tiers
-2. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — model, data, modules, infra
-   · [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md) — canonical schema
-   · [`docs/NON-FUNCTIONAL.md`](docs/NON-FUNCTIONAL.md) — RBAC, UX, consistency, a11y…
-3. [`docs/DECISIONS.md`](docs/DECISIONS.md) — decision log + rationale
-4. [`docs/BUILD-GUIDE.md`](docs/BUILD-GUIDE.md) — **step-by-step build** (order + commands + done-checks, links into specs)
-5. [`docs/DEMO.md`](docs/DEMO.md) — 5-minute demo script + verification
+## Run it — single command
 
-To change scope: **add** a feature = new file in `docs/features/`; **remove** = delete its file;
-**re-tier** = rename its `mvp-`/`stretch-`/`future-` prefix. Keep `docs/features/README.md` in sync.
+Requires Docker.
 
-## Planned quick start (after build)
 ```bash
-docker compose up                      # localhost:3000 (desktop demo)
-docker compose --profile tunnel up     # + HTTPS URL for phone demo
+docker compose up --build
 ```
+
+Then open **http://localhost:3000**.
+
+- `db` (Postgres) + `api` (NestJS, runs migrate + seed on boot) + `web` (nginx serving the build, proxying `/api`).
+- Phone push demo (HTTPS tunnel): `docker compose --profile tunnel up` → open the printed `*.trycloudflare.com` URL.
+
+### Demo accounts
+
+- **Staff:** `karim@kitchen.local` / `staff123` (or `rofiq@kitchen.local`)
+- **Member:** sign up with any `@questionpro.com` email (role is derived from the email domain)
+
+## Local development
+
+```bash
+pnpm install
+pnpm -C packages/types build
+cp apps/backend/.env.example apps/backend/.env   # fresh clone only
+docker compose up -d db                          # Postgres only
+pnpm -C apps/backend exec prisma migrate deploy && pnpm -C apps/backend exec prisma db seed
+pnpm turbo dev                                    # backend :3001, frontend :5173
+```
+
+Frontend dev: http://localhost:5173 (proxies `/api` → `:3001`).
+
+## Features
+
+Auth (JWT cookie, role-by-domain, Google-SSO seam) · groups home with previews + unread ·
+message thread (text / quick / request / system bubbles, day separators) · multi-item order
+builder + Quick Picks (saved defaults) + personal add-ons · order status tracking (role-scoped)
+· staff per-group queue with filters · lunch quick-actions + lunch-off dates · message deletion
+(soft, tombstone) · realtime SSE · web-push + installable PWA · settings (language en/bn,
+notification prefs, availability).
+
+## Demo script (≈5 min)
+
+1. Member opens **Requests**, builds "☕ Tea ×2 + 🍪 Biscuit" → sends one order bubble (Pending).
+2. Staff (Queue) sees it live → **Start** → **Done**; member's thread + a push update live.
+3. Member sets a **Quick Pick** for coffee → one-tap reorder.
+4. **Breakfast** order via the builder; **Lunch** → "Stop my lunch" / off-on-date.
+5. Switch language to **বাংলা** in settings — whole UI re-renders.
+6. Architecture: one repo, SSE + VAPID (no cloud), `docker compose up` only.
+
+## Notes
+
+- Demo secrets (JWT, VAPID keys) are committed in `docker-compose.yml` — **demo-only**.
+- Not yet built: bulk delete, full Bangla strings, email verify / password reset (need a mailer).
