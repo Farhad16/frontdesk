@@ -3,7 +3,9 @@ import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
 import {useMemo, useState} from 'react'
 import {useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
+import {Composer} from '../groups/Composer'
 import {dayKey} from '../groups/threadFormat'
+import {useGroupConfig} from '../groups/useGroupConfig'
 import {t} from '../i18n'
 import {QueueRow} from './QueueRow'
 import {useQueue} from './useQueue'
@@ -14,10 +16,13 @@ const STATUSES: Array<Status | 'ALL'> = ['ALL', 'PENDING', 'IN_PROGRESS', 'DONE'
 export function QueueView() {
   const {key = ''} = useParams()
   const {user} = useAuth()
+  const config = useGroupConfig(key)
   const {items, loading, error, updateStatus} = useQueue()
   const [status, setStatus] = useState<Status | 'ALL'>('ALL')
   const [name, setName] = useState('')
   const [todayOnly, setTodayOnly] = useState(false)
+
+  const tracksStatus = Boolean(config?.statusTracking)
 
   const todayKey = dayKey(new Date().toISOString())
 
@@ -36,16 +41,17 @@ export function QueueView() {
     <div className={styles.fdQueue}>
       <div className={styles.fdQueueFilters}>
         <div className={styles.fdChips}>
-          {STATUSES.map(value => (
-            <button
-              key={value}
-              type="button"
-              className={value === status ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
-              onClick={() => setStatus(value)}
-            >
-              {value === 'ALL' ? t('queue.filterAllStatus') : t(`status.${value.toLowerCase()}`)}
-            </button>
-          ))}
+          {tracksStatus &&
+            STATUSES.map(value => (
+              <button
+                key={value}
+                type="button"
+                className={value === status ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
+                onClick={() => setStatus(value)}
+              >
+                {value === 'ALL' ? t('queue.filterAllStatus') : t(`status.${value.toLowerCase()}`)}
+              </button>
+            ))}
           <button
             type="button"
             className={todayOnly ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
@@ -97,6 +103,8 @@ export function QueueView() {
           </div>
         )}
       </div>
+
+      <Composer groupKey={key} />
     </div>
   )
 }

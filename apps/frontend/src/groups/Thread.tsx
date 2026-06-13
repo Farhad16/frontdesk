@@ -1,48 +1,23 @@
-import {WuButton, WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
-import {Fragment, useEffect, useRef, useState, type FormEvent} from 'react'
+import {WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {Fragment, useEffect, useRef} from 'react'
 import {useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
+import {Composer} from './Composer'
 import {MessageBubble} from './MessageBubble'
-import {RequestBuilder} from './RequestBuilder'
 import {dayKey, dayLabel} from './threadFormat'
-import {useGroupConfig} from './useGroupConfig'
 import {useThread} from './useThread'
 import styles from './Thread.module.css'
 
 export function Thread() {
   const {key = ''} = useParams()
   const {user} = useAuth()
-  const config = useGroupConfig(key)
-  const {messages, loading, error, sending, send, sendRequest, sendQuick, updateStatus} =
-    useThread(key)
-  const [draft, setDraft] = useState('')
-  const [builderOpen, setBuilderOpen] = useState(false)
+  const {messages, loading, error, updateStatus} = useThread(key)
   const bodyRef = useRef<HTMLDivElement>(null)
-
-  const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
-  const quickActions = (config?.quickActions ?? []).filter(
-    action =>
-      action.messageKey &&
-      !action.opensDatePicker &&
-      (!action.visibleToRole || action.visibleToRole === user?.role),
-  )
 
   useEffect(() => {
     bodyRef.current?.scrollTo({top: bodyRef.current.scrollHeight})
   }, [messages])
-
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault()
-    const text = draft.trim()
-    if (!text || sending) return
-    setDraft('')
-    try {
-      await send(text)
-    } catch {
-      setDraft(text)
-    }
-  }
 
   let lastDay = ''
 
@@ -60,9 +35,9 @@ export function Thread() {
         )}
 
         {messages.map(message => {
-          const key = dayKey(message.createdAt)
-          const newDay = key !== lastDay
-          lastDay = key
+          const dKey = dayKey(message.createdAt)
+          const newDay = dKey !== lastDay
+          lastDay = dKey
           return (
             <Fragment key={message.id}>
               {newDay && (
@@ -82,53 +57,7 @@ export function Thread() {
         })}
       </div>
 
-      {quickActions.length > 0 && (
-        <div className={styles.fdQuickRow}>
-          {quickActions.map(action => (
-            <button
-              key={action.key}
-              type="button"
-              className={styles.fdQuickBtn}
-              disabled={sending}
-              onClick={() => void sendQuick(action.key)}
-            >
-              {t(`quick.${action.key}`)}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <form className={styles.fdComposer} onSubmit={handleSubmit}>
-        {hasCatalog && (
-          <WuButton
-            type="button"
-            variant="iconOnly"
-            className={styles.fdComposerAdd}
-            Icon={<span aria-hidden="true">＋</span>}
-            aria-label={t('builder.newRequest')}
-            onClick={() => setBuilderOpen(true)}
-          />
-        )}
-        <WuInput
-          variant="outlined"
-          type="text"
-          placeholder={t('thread.inputPlaceholder')}
-          value={draft}
-          onChange={event => setDraft(event.target.value)}
-        />
-        <WuButton type="submit" variant="primary" loading={sending} disabled={!draft.trim()}>
-          {t('thread.send')}
-        </WuButton>
-      </form>
-
-      {builderOpen && config && (
-        <RequestBuilder
-          config={config}
-          sending={sending}
-          onClose={() => setBuilderOpen(false)}
-          onSend={sendRequest}
-        />
-      )}
+      <Composer groupKey={key} />
     </div>
   )
 }

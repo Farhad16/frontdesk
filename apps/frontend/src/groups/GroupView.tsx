@@ -1,11 +1,9 @@
 import {WuButton} from '@npm-questionpro/wick-ui-lib'
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
-import {ViewToggle} from '../components/ViewToggle'
 import {t} from '../i18n'
 import {markGroupRead} from '../lib/reads'
-import {getViewMode, setViewMode, type ViewMode} from '../lib/viewMode'
 import {QueueView} from '../queue/QueueView'
 import styles from './GroupView.module.css'
 import {Thread} from './Thread'
@@ -16,18 +14,13 @@ export function GroupView() {
   const navigate = useNavigate()
   const {user} = useAuth()
   const {groups} = useGroups()
-  const [mode, setMode] = useState<ViewMode>(() => getViewMode(user?.role))
 
   useEffect(() => {
     if (key) markGroupRead(key)
   }, [key])
 
   const group = groups.find(item => item.key === key)
-
-  function change(next: ViewMode) {
-    setMode(next)
-    setViewMode(next)
-  }
+  const isStaff = user?.role === 'STAFF'
 
   return (
     <div className={styles.fdGroupView}>
@@ -43,12 +36,9 @@ export function GroupView() {
           {group?.emoji}
         </span>
         <span className={styles.fdName}>{group ? t(group.nameKey) : key}</span>
-        <span className={styles.fdToggleSlot}>
-          <ViewToggle mode={mode} onChange={change} />
-        </span>
       </header>
 
-      <div className={styles.fdViewBody}>{mode === 'queue' ? <QueueView /> : <Thread />}</div>
+      <div className={styles.fdViewBody}>{isStaff ? <QueueView /> : <Thread />}</div>
     </div>
   )
 }
