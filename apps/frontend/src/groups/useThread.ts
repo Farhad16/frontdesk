@@ -1,4 +1,4 @@
-import type {IMessage, IRequestPayload} from '@frontdesk/types'
+import type {IMessage, IRequestPayload, IStatusUpdateResult, Status} from '@frontdesk/types'
 import {useCallback, useEffect, useState} from 'react'
 import {apiClient} from '../lib/apiClient'
 
@@ -15,6 +15,7 @@ interface IThreadState {
   sending: boolean
   send: (text: string) => Promise<void>
   sendRequest: (input: ISendRequestInput) => Promise<void>
+  updateStatus: (messageId: string, status: Status) => Promise<void>
 }
 
 export function useThread(groupKey: string): IThreadState {
@@ -66,5 +67,19 @@ export function useThread(groupKey: string): IThreadState {
     [groupKey],
   )
 
-  return {messages, loading, error, sending, send, sendRequest}
+  const updateStatus = useCallback(
+    async (messageId: string, status: Status) => {
+      const result = await apiClient.patch<IStatusUpdateResult>(
+        `/groups/${groupKey}/messages/${messageId}/status`,
+        {status},
+      )
+      setMessages(prev => [
+        ...prev.map(message => (message.id === result.message.id ? result.message : message)),
+        result.system,
+      ])
+    },
+    [groupKey],
+  )
+
+  return {messages, loading, error, sending, send, sendRequest, updateStatus}
 }

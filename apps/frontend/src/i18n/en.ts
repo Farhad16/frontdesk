@@ -98,6 +98,14 @@ export const en = {
   'builder.remove': 'Remove',
   'builder.send': 'Send order',
   'builder.close': 'Close',
+
+  'status.pending': 'Pending',
+  'status.in_progress': 'In progress',
+  'status.done': 'Done',
+  'status.cancelled': 'Cancelled',
+  'status.start': 'Start',
+  'status.markDone': 'Mark done',
+  'status.cancel': 'Cancel',
 } as const
 
 export type TranslationKey = keyof typeof en

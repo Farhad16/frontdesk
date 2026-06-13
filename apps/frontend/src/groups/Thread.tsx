@@ -17,7 +17,7 @@ export function Thread() {
   const {user} = useAuth()
   const {groups} = useGroups()
   const config = useGroupConfig(key)
-  const {messages, loading, error, sending, send, sendRequest} = useThread(key)
+  const {messages, loading, error, sending, send, sendRequest, updateStatus} = useThread(key)
   const [draft, setDraft] = useState('')
   const [builderOpen, setBuilderOpen] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
@@ -81,7 +81,13 @@ export function Thread() {
                   <span>{dayLabel(message.createdAt)}</span>
                 </div>
               )}
-              <MessageBubble message={message} isOwn={message.sender.id === user?.id} />
+              <MessageBubble
+                message={message}
+                isOwn={message.sender.id === user?.id}
+                currentUserId={user?.id}
+                currentRole={user?.role}
+                onUpdateStatus={updateStatus}
+              />
             </Fragment>
           )
         })}

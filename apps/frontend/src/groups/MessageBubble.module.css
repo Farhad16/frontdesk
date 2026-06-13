@@ -119,6 +119,12 @@
   }
 }
 
+.fdActions {
+  display: flex;
+  gap: calc(var(--fd-space) * 0.75);
+  margin-top: calc(var(--fd-space) * 0.5);
+}
+
 .fdTime {
   align-self: flex-end;
   color: color-mix(in srgb, var(--fd-text), transparent 45%);
