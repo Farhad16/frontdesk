@@ -93,6 +93,16 @@
   font-weight: 600;
 }
 
+.fdPushRow {
+  margin-bottom: var(--fd-space);
+}
+
+.fdPushOn {
+  color: #15803d;
+  font-size: calc(var(--fd-font) * 0.93);
+  font-weight: 600;
+}
+
 .fdRadioList {
   display: flex;
   flex-direction: column;

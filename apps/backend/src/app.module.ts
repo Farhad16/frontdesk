@@ -6,6 +6,7 @@ import {GroupsModule} from './groups/groups.module'
 import {HealthController} from './health/health.controller'
 import {MessagesModule} from './messages/messages.module'
 import {PrismaModule} from './prisma/prisma.module'
+import {PushModule} from './push/push.module'
 import {UsersModule} from './users/users.module'
 
 @Module({
@@ -13,6 +14,7 @@ import {UsersModule} from './users/users.module'
     ConfigModule.forRoot({isGlobal: true}),
     PrismaModule,
     EventsModule,
+    PushModule,
     AuthModule,
     GroupsModule,
     MessagesModule,

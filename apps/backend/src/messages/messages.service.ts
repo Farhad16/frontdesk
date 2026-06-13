@@ -16,6 +16,7 @@ import {
 import type {Message, Prisma, User} from '@prisma/client'
 import {EventsService} from '../events/events.service'
 import {PrismaService} from '../prisma/prisma.service'
+import {PushService} from '../push/push.service'
 import type {CreateRequestDto} from './dto/request.dto'
 
 const STATUS_LABEL: Record<Status, string> = {
@@ -32,6 +33,7 @@ export class MessagesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly events: EventsService,
+    private readonly push: PushService,
   ) {}
 
   async listForGroup(groupKey: string): Promise<IMessage[]> {
@@ -52,6 +54,7 @@ export class MessagesService {
     })
     const mapped = toMessage(message)
     this.events.emit({type: 'message:new', groupKey, message: mapped})
+    void this.push.notifyNewMessage(senderId, groupKey, mapped)
     return mapped
   }
 
@@ -71,6 +74,7 @@ export class MessagesService {
     })
     const mapped = toMessage(message)
     this.events.emit({type: 'message:new', groupKey, message: mapped})
+    void this.push.notifyNewMessage(senderId, groupKey, mapped)
     return mapped
   }
 
@@ -124,6 +128,7 @@ export class MessagesService {
     const result = {message: toMessage(updated), system: toMessage(system)}
     this.events.emit({type: 'message:status', groupKey, message: result.message})
     this.events.emit({type: 'message:new', groupKey, message: result.system})
+    void this.push.notifyOwnerUpdate(actor.id, result.message.sender.id, groupKey, result.message)
     return result
   }
 

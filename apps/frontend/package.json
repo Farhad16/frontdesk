@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@frontdesk/types": "workspace:*",
-    "@npm-questionpro/wick-ui-lib": "latest",
     "@npm-questionpro/wick-ui-icon": "latest",
+    "@npm-questionpro/wick-ui-lib": "latest",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0"
@@ -22,6 +22,9 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "typescript": "^5.5.4",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "vite-plugin-pwa": "^1.3.0",
+    "workbox-precaching": "^7.4.1",
+    "workbox-window": "^7.4.1"
   }
 }

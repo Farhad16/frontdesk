@@ -5,6 +5,7 @@ import {useAuth} from '../auth/AuthContext'
 import {AppHeader} from '../components/AppHeader'
 import {t, type Locale} from '../i18n'
 import {useLanguage} from '../i18n/LanguageContext'
+import {enablePush, getPushStatus, type PushStatus} from '../lib/push'
 import styles from './SettingsPage.module.css'
 
 const NOTIF_OPTIONS: Array<{value: NotificationPref; labelKey: string}> = [
@@ -24,9 +25,14 @@ export function SettingsPage() {
   const {user, updateUser} = useAuth()
   const {setLocale} = useLanguage()
   const [addOnDraft, setAddOnDraft] = useState('')
+  const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
 
   if (!user) return null
   const isStaff = user.role === 'STAFF'
+
+  async function handleEnablePush() {
+    setPushStatus(await enablePush())
+  }
 
   function changeLanguage(locale: Locale) {
     setLocale(locale)
@@ -86,6 +92,17 @@ export function SettingsPage() {
 
         <section className={styles.fdCard}>
           <h2 className={styles.fdCardTitle}>{t('settings.notifications')}</h2>
+          <div className={styles.fdPushRow}>
+            {pushStatus === 'granted' ? (
+              <span className={styles.fdPushOn}>✓ {t('settings.notificationsEnabled')}</span>
+            ) : pushStatus === 'denied' ? (
+              <span className={styles.fdNote}>{t('settings.notificationsBlocked')}</span>
+            ) : pushStatus === 'unsupported' ? null : (
+              <WuButton variant="primary" size="sm" onClick={handleEnablePush}>
+                {t('settings.enableNotifications')}
+              </WuButton>
+            )}
+          </div>
           {isStaff ? (
             <p className={styles.fdNote}>{t('settings.notifStaffForced')}</p>
           ) : (
