@@ -38,7 +38,7 @@ export const bn: Partial<Record<string, string>> = {
   'status.markDone': 'সম্পন্ন করুন',
   'status.cancel': 'বাতিল',
 
-  'view.thread': 'গ্রুপ',
+  'view.thread': 'থ্রেড',
   'view.queue': 'কিউ',
 
   'builder.send': 'অর্ডার পাঠান',

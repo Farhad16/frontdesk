@@ -6,6 +6,11 @@
   background: var(--fd-surface);
 }
 
+.fdQueueToggle {
+  max-width: 18rem;
+  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2) 0;
+}
+
 .fdQueueFilters {
   display: flex;
   flex-direction: column;

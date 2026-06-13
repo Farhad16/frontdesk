@@ -9,7 +9,7 @@ import {Thread} from './groups/Thread'
 import {useLanguage} from './i18n/LanguageContext'
 import type {Locale} from './i18n'
 import {getViewMode} from './lib/viewMode'
-import {QueuePage} from './queue/QueuePage'
+import {QueueView} from './queue/QueueView'
 import {SettingsPage} from './settings/SettingsPage'
 
 export default function App() {
@@ -37,15 +37,15 @@ export default function App() {
 
   if (!user) return <AuthPage />
 
-  const home = getViewMode(user.role) === 'queue' ? '/queue' : '/groups'
+  const home = getViewMode(user.role) === 'queue' ? '/groups/queue' : '/groups'
 
   return (
     <Routes>
       <Route path="/groups" element={<GroupsPage />}>
         <Route index element={<GroupsEmpty />} />
+        <Route path="queue" element={<QueueView />} />
         <Route path=":key" element={<Thread />} />
       </Route>
-      <Route path="/queue" element={<QueuePage />} />
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="*" element={<Navigate to={home} replace />} />
     </Routes>

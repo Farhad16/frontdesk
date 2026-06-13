@@ -1,7 +1,6 @@
 import type {Status} from '@frontdesk/types'
 import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
 import {useMemo, useState} from 'react'
-import {AppHeader} from '../components/AppHeader'
 import {useAuth} from '../auth/AuthContext'
 import {useGroups} from '../groups/useGroups'
 import {dayKey} from '../groups/threadFormat'
@@ -12,7 +11,7 @@ import styles from './QueuePage.module.css'
 
 const STATUSES: Array<Status | 'ALL'> = ['ALL', 'PENDING', 'IN_PROGRESS', 'DONE', 'CANCELLED']
 
-export function QueuePage() {
+export function QueueView() {
   const {user} = useAuth()
   const {groups} = useGroups()
   const {items, loading, error, updateStatus} = useQueue()
@@ -36,8 +35,6 @@ export function QueuePage() {
 
   return (
     <div className={styles.fdQueue}>
-      <AppHeader />
-
       <div className={styles.fdQueueFilters}>
         <div className={styles.fdChips}>
           {STATUSES.map(value => (

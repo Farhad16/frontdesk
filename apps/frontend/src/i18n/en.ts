@@ -107,7 +107,7 @@ export const en = {
   'status.markDone': 'Mark done',
   'status.cancel': 'Cancel',
 
-  'view.thread': 'Groups',
+  'view.thread': 'Thread',
   'view.queue': 'Queue',
 
   'queue.title': 'Request queue',

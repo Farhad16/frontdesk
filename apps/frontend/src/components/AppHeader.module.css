@@ -12,6 +12,10 @@
   display: flex;
   align-items: center;
   gap: calc(var(--fd-space) * 0.75);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
 
   img {
     height: calc(var(--fd-space) * 3);
@@ -25,46 +29,6 @@
   font-weight: 600;
 }
 
-.fdToggle {
-  display: flex;
-  padding: calc(var(--fd-space) * 0.25);
-  border-radius: var(--fd-radius-pill, 624.9375rem);
-  background: var(--fd-surface);
-}
-
-.fdToggleBtn {
-  padding: calc(var(--fd-space) * 0.5) calc(var(--fd-space) * 1.5);
-  border: 0;
-  border-radius: var(--fd-radius-pill, 624.9375rem);
-  background: none;
-  color: color-mix(in srgb, var(--fd-text), transparent 25%);
-  font: inherit;
-  font-size: calc(var(--fd-font) * 0.86);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.fdToggleOn {
-  background: var(--fd-bg);
-  color: var(--fd-primary);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
-}
-
-.fdHeaderUser {
-  display: flex;
-  align-items: center;
-  gap: var(--fd-space);
-}
-
-.fdSettingsBtn {
-  width: calc(var(--fd-space) * 3.5);
-  height: calc(var(--fd-space) * 3.5);
-  padding: 0;
-  border: 1px solid var(--fd-border);
-  border-radius: 50%;
-  font-size: calc(var(--fd-font) * 1.1);
-}
-
 .fdAvatar {
   display: flex;
   width: calc(var(--fd-space) * 3.5);
@@ -72,11 +36,58 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: var(--fd-primary);
   color: #fff;
   font-size: calc(var(--fd-font) * 0.93);
   font-weight: 700;
+  cursor: pointer;
+}
+
+.fdMenu {
+  display: flex;
+  min-width: 12rem;
+  flex-direction: column;
+  padding: calc(var(--fd-space) * 0.5);
+}
+
+.fdMenuUser {
+  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  margin-bottom: calc(var(--fd-space) * 0.5);
+}
+
+.fdMenuName {
+  font-size: calc(var(--fd-font) * 0.93);
+  font-weight: 700;
+}
+
+.fdMenuEmail {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: calc(var(--fd-font) * 0.82);
+  text-overflow: ellipsis;
+}
+
+.fdMenuItem {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
+  border: 0;
+  border-radius: var(--fd-radius);
+  background: none;
+  color: var(--fd-text);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.93);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fd-surface);
+  }
 }
 
 @media (max-width: 36rem) {

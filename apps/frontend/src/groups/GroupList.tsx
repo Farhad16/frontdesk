@@ -1,6 +1,7 @@
 import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
 import {useState} from 'react'
 import {NavLink} from 'react-router-dom'
+import {ViewToggle} from '../components/ViewToggle'
 import {t} from '../i18n'
 import styles from './GroupList.module.css'
 import {useGroups} from './useGroups'
@@ -15,6 +16,9 @@ export function GroupList() {
 
   return (
     <div className={styles.fdGroupList}>
+      <div className={styles.fdGroupToggle}>
+        <ViewToggle />
+      </div>
       <div className={styles.fdGroupSearch}>
         <WuInput
           variant="outlined"

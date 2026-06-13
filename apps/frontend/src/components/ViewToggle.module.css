@@ -1,0 +1,25 @@
+.fdToggle {
+  display: flex;
+  padding: calc(var(--fd-space) * 0.25);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-surface);
+}
+
+.fdToggleBtn {
+  flex: 1;
+  padding: calc(var(--fd-space) * 0.5) var(--fd-space);
+  border: 0;
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: none;
+  color: color-mix(in srgb, var(--fd-text), transparent 25%);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fdToggleOn {
+  background: var(--fd-bg);
+  color: var(--fd-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+}

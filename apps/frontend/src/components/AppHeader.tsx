@@ -1,60 +1,65 @@
-import {WuButton} from '@npm-questionpro/wick-ui-lib'
-import {useLocation, useNavigate} from 'react-router-dom'
+import {WuPopover} from '@npm-questionpro/wick-ui-lib'
+import {useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
-import {setViewMode} from '../lib/viewMode'
+import {getViewMode} from '../lib/viewMode'
 import styles from './AppHeader.module.css'
 
 export function AppHeader() {
   const {user, logout} = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
-  const onQueue = location.pathname.startsWith('/queue')
+  const [menuOpen, setMenuOpen] = useState(false)
 
-  function go(mode: 'thread' | 'queue') {
-    setViewMode(mode)
-    navigate(mode === 'queue' ? '/queue' : '/groups')
+  function goHome() {
+    navigate(getViewMode(user?.role) === 'queue' ? '/groups/queue' : '/groups')
   }
 
   return (
     <header className={styles.fdHeader}>
-      <div className={styles.fdHeaderBrand}>
+      <button type="button" className={styles.fdHeaderBrand} onClick={goHome} aria-label={t('auth.brand')}>
         <img src="/questionpro-logo.svg" alt="QuestionPro" />
         <span className={styles.fdHeaderTitle}>{t('auth.brand')}</span>
-      </div>
+      </button>
 
-      <div className={styles.fdToggle} role="tablist">
-        <button
-          type="button"
-          className={!onQueue ? `${styles.fdToggleBtn} ${styles.fdToggleOn}` : styles.fdToggleBtn}
-          onClick={() => go('thread')}
-        >
-          {t('view.thread')}
-        </button>
-        <button
-          type="button"
-          className={onQueue ? `${styles.fdToggleBtn} ${styles.fdToggleOn}` : styles.fdToggleBtn}
-          onClick={() => go('queue')}
-        >
-          {t('view.queue')}
-        </button>
-      </div>
-
-      <div className={styles.fdHeaderUser}>
-        <WuButton
-          variant="iconOnly"
-          className={styles.fdSettingsBtn}
-          Icon={<span aria-hidden="true">⚙</span>}
-          aria-label={t('settings.title')}
-          onClick={() => navigate('/settings')}
-        />
-        <span className={styles.fdAvatar} aria-hidden="true">
-          {user?.name?.charAt(0).toUpperCase()}
-        </span>
-        <WuButton variant="outline" size="sm" onClick={logout}>
-          {t('home.logout')}
-        </WuButton>
-      </div>
+      <WuPopover
+        open={menuOpen}
+        onOpenChange={setMenuOpen}
+        align="end"
+        sideOffset={8}
+        Trigger={
+          <button type="button" className={styles.fdAvatar} aria-label={user?.name}>
+            {user?.name?.charAt(0).toUpperCase()}
+          </button>
+        }
+      >
+        <div className={styles.fdMenu}>
+          <div className={styles.fdMenuUser}>
+            <div className={styles.fdMenuName}>{user?.name}</div>
+            <div className={styles.fdMenuEmail}>{user?.email}</div>
+          </div>
+          <button
+            type="button"
+            className={styles.fdMenuItem}
+            onClick={() => {
+              setMenuOpen(false)
+              navigate('/settings')
+            }}
+          >
+            ⚙ {t('settings.title')}
+          </button>
+          <button
+            type="button"
+            className={styles.fdMenuItem}
+            onClick={() => {
+              setMenuOpen(false)
+              void logout()
+            }}
+          >
+            ⎋ {t('home.logout')}
+          </button>
+        </div>
+      </WuPopover>
     </header>
   )
 }
