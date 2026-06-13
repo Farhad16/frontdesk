@@ -16,7 +16,7 @@ interface IRequestBuilderProps {
 }
 
 export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuilderProps) {
-  const {user} = useAuth()
+  const {user, updateUser} = useAuth()
   const {find, save} = usePreferences()
   const catalog = config.catalog ?? []
 
@@ -85,9 +85,13 @@ export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuild
 
   function commitAddOnDraft() {
     const value = addOnDraft.trim()
-    if (!value || addOns.includes(value)) return
-    setAddOns(prev => [...prev, value])
+    if (!value) return
+    if (!addOns.includes(value)) setAddOns(prev => [...prev, value])
     setAddOnDraft('')
+    // Save a brand-new extra to the user's personal add-on library.
+    if (user && !user.addOns.includes(value)) {
+      void updateUser({addOns: [...user.addOns, value]})
+    }
   }
 
   function addItemLine() {
