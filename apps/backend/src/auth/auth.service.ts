@@ -5,6 +5,7 @@ import type {User} from '@prisma/client'
 import type {ICurrentUser, IOAuthProfile, Role} from '@frontdesk/types'
 import * as bcrypt from 'bcrypt'
 import {PrismaService} from '../prisma/prisma.service'
+import {toCurrentUser} from '../users/user.mapper'
 import type {LoginDto, SignupDto} from './dto/auth.dto'
 
 @Injectable()
@@ -81,19 +82,5 @@ export class AuthService {
 
   private signToken(user: User): string {
     return this.jwt.sign({sub: user.id, role: user.role})
-  }
-}
-
-function toCurrentUser(user: User): ICurrentUser {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    photoUrl: user.photoUrl ?? undefined,
-    role: user.role,
-    locale: user.locale,
-    notificationPref: user.notificationPref,
-    availability: user.availability,
-    addOns: user.addOns,
   }
 }

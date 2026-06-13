@@ -8,6 +8,7 @@ interface IAuthContext {
   login: (input: ILoginInput) => Promise<void>
   signup: (input: ISignupInput) => Promise<void>
   logout: () => Promise<void>
+  updateUser: (patch: Partial<ICurrentUser>) => Promise<ICurrentUser>
 }
 
 const AuthContext = createContext<IAuthContext | null>(null)
@@ -37,8 +38,16 @@ export function AuthProvider({children}: {children: ReactNode}) {
     setUser(null)
   }, [])
 
+  const updateUser = useCallback(async (patch: Partial<ICurrentUser>) => {
+    const updated = await apiClient.patch<ICurrentUser>('/users/me', patch)
+    setUser(updated)
+    return updated
+  }, [])
+
   return (
-    <AuthContext.Provider value={{user, loading, login, signup, logout}}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{user, loading, login, signup, logout, updateUser}}>
+      {children}
+    </AuthContext.Provider>
   )
 }
 

@@ -1,0 +1,136 @@
+.fdSettings {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--fd-surface);
+}
+
+.fdSettingsBody {
+  flex: 1;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: calc(var(--fd-space) * 2);
+}
+
+.fdSettingsTitle {
+  margin: 0 0 calc(var(--fd-space) * 2);
+  font-size: calc(var(--fd-font) * 1.5);
+  font-weight: 700;
+}
+
+.fdCard {
+  margin-bottom: calc(var(--fd-space) * 2);
+  padding: calc(var(--fd-space) * 2);
+  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  border-radius: calc(var(--fd-radius) * 2);
+  background: var(--fd-bg);
+}
+
+.fdCardTitle {
+  margin: 0 0 var(--fd-space);
+  font-size: var(--fd-font);
+  font-weight: 700;
+}
+
+.fdProfile {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+}
+
+.fdProfileAvatar {
+  display: flex;
+  width: calc(var(--fd-space) * 6);
+  height: calc(var(--fd-space) * 6);
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-primary);
+  color: #fff;
+  font-size: calc(var(--fd-font) * 1.5);
+  font-weight: 700;
+}
+
+.fdProfileName {
+  font-weight: 700;
+}
+
+.fdProfileMeta {
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: calc(var(--fd-font) * 0.86);
+}
+
+.fdNote {
+  margin: 0 0 var(--fd-space);
+  color: color-mix(in srgb, var(--fd-text), transparent 30%);
+  font-size: calc(var(--fd-font) * 0.86);
+}
+
+.fdChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--fd-space) * 0.75);
+}
+
+.fdChip {
+  padding: calc(var(--fd-space) * 0.5) var(--fd-space);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-bg);
+  color: var(--fd-text);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  cursor: pointer;
+}
+
+.fdChipOn {
+  border-color: var(--fd-primary);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  color: var(--fd-primary);
+  font-weight: 600;
+}
+
+.fdRadioList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fd-space);
+}
+
+.fdRadio {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  font-size: calc(var(--fd-font) * 0.93);
+  cursor: pointer;
+}
+
+.fdAddOn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+  padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 0.9);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 0.86);
+
+  button {
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--fd-text), transparent 30%);
+    cursor: pointer;
+  }
+}
+
+.fdInline {
+  display: flex;
+  gap: var(--fd-space);
+  align-items: center;
+  margin-top: var(--fd-space);
+
+  > :first-child {
+    flex: 1;
+  }
+}

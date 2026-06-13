@@ -1,15 +1,24 @@
 import {WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {useEffect} from 'react'
 import {Navigate, Route, Routes} from 'react-router-dom'
 import {AuthPage} from './auth/AuthPage'
 import {useAuth} from './auth/AuthContext'
 import {GroupsEmpty} from './groups/GroupsEmpty'
 import {GroupsPage} from './groups/GroupsPage'
 import {Thread} from './groups/Thread'
+import {useLanguage} from './i18n/LanguageContext'
+import type {Locale} from './i18n'
 import {getViewMode} from './lib/viewMode'
 import {QueuePage} from './queue/QueuePage'
+import {SettingsPage} from './settings/SettingsPage'
 
 export default function App() {
   const {user, loading} = useAuth()
+  const {setLocale} = useLanguage()
+
+  useEffect(() => {
+    if (user?.locale) setLocale(user.locale as Locale)
+  }, [user?.locale, setLocale])
 
   if (loading) {
     return (
@@ -37,6 +46,7 @@ export default function App() {
         <Route path=":key" element={<Thread />} />
       </Route>
       <Route path="/queue" element={<QueuePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
       <Route path="*" element={<Navigate to={home} replace />} />
     </Routes>
   )

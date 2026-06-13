@@ -1,0 +1,58 @@
+// Partial Bangla dictionary. Missing keys fall back to English.
+export const bn: Partial<Record<string, string>> = {
+  'auth.brand': 'ফ্রন্টডেস্ক',
+  'auth.signInHeading': 'সাইন ইন',
+  'auth.signInSubtitle': 'চালিয়ে যেতে আপনার অফিস অ্যাকাউন্ট ব্যবহার করুন।',
+  'auth.signUpHeading': 'অ্যাকাউন্ট তৈরি করুন',
+  'auth.signUpSubtitle': 'সদস্য হিসেবে আপনার ওয়ার্কস্পেসে যোগ দিন।',
+  'auth.email': 'অফিস ইমেইল',
+  'auth.password': 'পাসওয়ার্ড',
+  'auth.fullName': 'পুরো নাম',
+  'auth.confirmPassword': 'পাসওয়ার্ড নিশ্চিত করুন',
+  'auth.login': 'সাইন ইন',
+  'auth.createAccount': 'অ্যাকাউন্ট তৈরি করুন',
+  'auth.newHere': 'অ্যাকাউন্ট নেই?',
+  'auth.signup': 'সাইন আপ',
+  'auth.alreadyHaveAccount': 'ইতিমধ্যে অ্যাকাউন্ট আছে?',
+
+  'home.logout': 'লগ আউট',
+  'group.requests': 'অনুরোধ',
+  'group.breakfast': 'নাস্তা',
+  'group.lunch': 'দুপুরের খাবার',
+
+  'groups.searchPlaceholder': 'গ্রুপ খুঁজুন',
+  'groups.noMessages': 'এখনো কোনো বার্তা নেই',
+  'groups.pickPrompt': 'থ্রেড খুলতে একটি গ্রুপ বেছে নিন',
+
+  'thread.today': 'আজ',
+  'thread.yesterday': 'গতকাল',
+  'thread.empty': 'এখনো কোনো বার্তা নেই। কথা শুরু করুন।',
+  'thread.inputPlaceholder': 'একটি বার্তা লিখুন',
+  'thread.send': 'পাঠান',
+
+  'status.pending': 'অপেক্ষমাণ',
+  'status.in_progress': 'চলমান',
+  'status.done': 'সম্পন্ন',
+  'status.cancelled': 'বাতিল',
+  'status.start': 'শুরু',
+  'status.markDone': 'সম্পন্ন করুন',
+  'status.cancel': 'বাতিল',
+
+  'view.thread': 'গ্রুপ',
+  'view.queue': 'কিউ',
+
+  'builder.send': 'অর্ডার পাঠান',
+  'builder.addToOrder': 'অর্ডারে যোগ করুন',
+  'builder.category': 'ক্যাটাগরি',
+  'builder.item': 'আইটেম',
+  'builder.quantity': 'পরিমাণ',
+  'builder.order': 'অর্ডার',
+
+  'settings.title': 'সেটিংস',
+  'settings.profile': 'প্রোফাইল',
+  'settings.language': 'ভাষা',
+  'settings.notifications': 'নোটিফিকেশন',
+  'settings.addOns': 'অ্যাড-অন',
+  'settings.availability': 'উপলব্ধতা',
+  'settings.save': 'সংরক্ষণ',
+}

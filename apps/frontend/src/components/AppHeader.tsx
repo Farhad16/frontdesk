@@ -41,6 +41,13 @@ export function AppHeader() {
       </div>
 
       <div className={styles.fdHeaderUser}>
+        <WuButton
+          variant="iconOnly"
+          className={styles.fdSettingsBtn}
+          Icon={<span aria-hidden="true">⚙</span>}
+          aria-label={t('settings.title')}
+          onClick={() => navigate('/settings')}
+        />
         <span className={styles.fdAvatar} aria-hidden="true">
           {user?.name?.charAt(0).toUpperCase()}
         </span>
