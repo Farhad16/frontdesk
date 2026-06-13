@@ -1,7 +1,8 @@
 import {Injectable, NotFoundException} from '@nestjs/common'
-import type {IMessage, IMessagePayload} from '@frontdesk/types'
-import type {Message, User} from '@prisma/client'
+import {GROUP_CONFIGS, type IMessage, type IMessagePayload} from '@frontdesk/types'
+import type {Message, Prisma, User} from '@prisma/client'
 import {PrismaService} from '../prisma/prisma.service'
+import type {CreateRequestDto} from './dto/request.dto'
 
 type MessageWithSender = Message & {sender: User}
 
@@ -23,6 +24,23 @@ export class MessagesService {
     const group = await this.requireGroup(groupKey)
     const message = await this.prisma.message.create({
       data: {groupId: group.id, senderId, type: 'TEXT', text},
+      include: {sender: true},
+    })
+    return toMessage(message)
+  }
+
+  async createRequest(groupKey: string, senderId: string, dto: CreateRequestDto): Promise<IMessage> {
+    const group = await this.requireGroup(groupKey)
+    const tracksStatus = GROUP_CONFIGS[groupKey]?.statusTracking ?? false
+    const message = await this.prisma.message.create({
+      data: {
+        groupId: group.id,
+        senderId,
+        type: 'REQUEST',
+        payload: {items: dto.items, note: dto.note} as unknown as Prisma.InputJsonValue,
+        summary: dto.summary,
+        status: tracksStatus ? 'PENDING' : null,
+      },
       include: {sender: true},
     })
     return toMessage(message)

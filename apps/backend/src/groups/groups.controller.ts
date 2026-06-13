@@ -1,5 +1,5 @@
-import {Controller, Get, UseGuards} from '@nestjs/common'
-import type {IGroupSummary} from '@frontdesk/types'
+import {Controller, Get, Param, UseGuards} from '@nestjs/common'
+import type {IGroupConfig, IGroupSummary} from '@frontdesk/types'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import {GroupsService} from './groups.service'
 
@@ -11,5 +11,10 @@ export class GroupsController {
   @Get()
   list(): IGroupSummary[] {
     return this.groups.list()
+  }
+
+  @Get(':key/config')
+  config(@Param('key') key: string): IGroupConfig {
+    return this.groups.getConfig(key)
   }
 }

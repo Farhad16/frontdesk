@@ -4,6 +4,7 @@ import {CurrentUser} from '../auth/decorators/current-user.decorator'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import type {AuthUser} from '../auth/jwt.strategy'
 import {SendMessageDto} from './dto/message.dto'
+import {CreateRequestDto} from './dto/request.dto'
 import {MessagesService} from './messages.service'
 
 @Controller('groups/:key/messages')
@@ -23,5 +24,14 @@ export class MessagesController {
     @Body() dto: SendMessageDto,
   ): Promise<IMessage> {
     return this.messages.createText(key, user.id, dto.text)
+  }
+
+  @Post('request')
+  createRequest(
+    @Param('key') key: string,
+    @CurrentUser() user: AuthUser,
+    @Body() dto: CreateRequestDto,
+  ): Promise<IMessage> {
+    return this.messages.createRequest(key, user.id, dto)
   }
 }
