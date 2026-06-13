@@ -45,6 +45,10 @@ export interface ICreateMessageInput {
   payload?: IMessagePayload
   quickActionKey?: string
 }
+export interface IStatusUpdateResult {
+  message: IMessage
+  system: IMessage
+}
 
 export interface ICurrentUser {
   id: string

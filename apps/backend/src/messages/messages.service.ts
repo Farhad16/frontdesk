@@ -1,8 +1,27 @@
-import {Injectable, NotFoundException} from '@nestjs/common'
-import {GROUP_CONFIGS, type IMessage, type IMessagePayload} from '@frontdesk/types'
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import {
+  GROUP_CONFIGS,
+  type IMessage,
+  type IMessagePayload,
+  type IStatusUpdateResult,
+  type Role,
+  type Status,
+} from '@frontdesk/types'
 import type {Message, Prisma, User} from '@prisma/client'
 import {PrismaService} from '../prisma/prisma.service'
 import type {CreateRequestDto} from './dto/request.dto'
+
+const STATUS_LABEL: Record<Status, string> = {
+  PENDING: 'pending',
+  IN_PROGRESS: 'in progress',
+  DONE: 'done',
+  CANCELLED: 'cancelled',
+}
 
 type MessageWithSender = Message & {sender: User}
 
@@ -44,6 +63,64 @@ export class MessagesService {
       include: {sender: true},
     })
     return toMessage(message)
+  }
+
+  async updateStatus(
+    groupKey: string,
+    messageId: string,
+    actor: {id: string; role: Role},
+    next: Status,
+  ): Promise<IStatusUpdateResult> {
+    const group = await this.requireGroup(groupKey)
+    const message = await this.prisma.message.findUnique({
+      where: {id: messageId},
+      include: {sender: true},
+    })
+    if (!message || message.groupId !== group.id) throw new NotFoundException('Request not found')
+    if (message.type !== 'REQUEST' || message.status === null) {
+      throw new BadRequestException('Message is not status-tracked')
+    }
+
+    this.assertTransition(message.status, next, actor, message.senderId)
+
+    const actorUser = await this.prisma.user.findUnique({where: {id: actor.id}})
+    if (!actorUser) throw new ForbiddenException()
+
+    const [updated, system] = await this.prisma.$transaction([
+      this.prisma.message.update({
+        where: {id: messageId},
+        data: {status: next},
+        include: {sender: true},
+      }),
+      this.prisma.message.create({
+        data: {
+          groupId: group.id,
+          senderId: actor.id,
+          type: 'SYSTEM',
+          text: `${actorUser.name} marked it ${STATUS_LABEL[next]}`,
+        },
+        include: {sender: true},
+      }),
+    ])
+
+    return {message: toMessage(updated), system: toMessage(system)}
+  }
+
+  private assertTransition(
+    current: Status,
+    next: Status,
+    actor: {id: string; role: Role},
+    ownerId: string,
+  ): void {
+    if (actor.role === 'STAFF') {
+      const allowed: Partial<Record<Status, Status>> = {PENDING: 'IN_PROGRESS', IN_PROGRESS: 'DONE'}
+      if (allowed[current] !== next) throw new ForbiddenException('Invalid transition for staff')
+      return
+    }
+    const isOwner = actor.id === ownerId
+    if (!isOwner || current !== 'PENDING' || next !== 'CANCELLED') {
+      throw new ForbiddenException('Members can only cancel their own pending request')
+    }
   }
 
   private async requireGroup(groupKey: string) {
