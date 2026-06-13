@@ -13,6 +13,7 @@ import {
   type Status,
 } from '@frontdesk/types'
 import type {Message, Prisma, User} from '@prisma/client'
+import {EventsService} from '../events/events.service'
 import {PrismaService} from '../prisma/prisma.service'
 import type {CreateRequestDto} from './dto/request.dto'
 
@@ -27,7 +28,10 @@ type MessageWithSender = Message & {sender: User}
 
 @Injectable()
 export class MessagesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly events: EventsService,
+  ) {}
 
   async listForGroup(groupKey: string): Promise<IMessage[]> {
     const group = await this.requireGroup(groupKey)
@@ -45,7 +49,9 @@ export class MessagesService {
       data: {groupId: group.id, senderId, type: 'TEXT', text},
       include: {sender: true},
     })
-    return toMessage(message)
+    const mapped = toMessage(message)
+    this.events.emit({type: 'message:new', groupKey, message: mapped})
+    return mapped
   }
 
   async createRequest(groupKey: string, senderId: string, dto: CreateRequestDto): Promise<IMessage> {
@@ -62,7 +68,9 @@ export class MessagesService {
       },
       include: {sender: true},
     })
-    return toMessage(message)
+    const mapped = toMessage(message)
+    this.events.emit({type: 'message:new', groupKey, message: mapped})
+    return mapped
   }
 
   async updateStatus(
@@ -103,7 +111,10 @@ export class MessagesService {
       }),
     ])
 
-    return {message: toMessage(updated), system: toMessage(system)}
+    const result = {message: toMessage(updated), system: toMessage(system)}
+    this.events.emit({type: 'message:status', groupKey, message: result.message})
+    this.events.emit({type: 'message:new', groupKey, message: result.system})
+    return result
   }
 
   private assertTransition(
