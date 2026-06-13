@@ -1,3 +1,4 @@
+import {GROUP_CONFIGS, SEEDED_GROUP_KEYS} from '@frontdesk/types'
 import {PrismaClient} from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
@@ -17,8 +18,20 @@ async function main() {
       create: {...staff, role: 'STAFF', provider: 'PASSWORD', passwordHash},
     })
   }
-  const count = await prisma.user.count()
-  console.log(`Seeded staff. Total users: ${count}`)
+
+  for (const key of SEEDED_GROUP_KEYS) {
+    const config = GROUP_CONFIGS[key]
+    if (!config) continue
+    await prisma.group.upsert({
+      where: {key},
+      update: {nameKey: config.nameKey},
+      create: {key, nameKey: config.nameKey},
+    })
+  }
+
+  const users = await prisma.user.count()
+  const groups = await prisma.group.count()
+  console.log(`Seeded ${users} users and ${groups} groups.`)
 }
 
 main()

@@ -1,0 +1,12 @@
+-- CreateTable
+CREATE TABLE "Group" (
+    "id" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "nameKey" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Group_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Group_key_key" ON "Group"("key");

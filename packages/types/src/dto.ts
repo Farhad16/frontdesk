@@ -72,6 +72,11 @@ export interface IOAuthProfile {
   photoUrl?: string
   providerId: string
 }
+export interface IGroupSummary {
+  key: string
+  nameKey: string
+  emoji: string
+}
 export interface IPushSubscriptionInput {
   endpoint: string
   keys: {p256dh: string; auth: string}
