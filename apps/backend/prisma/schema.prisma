@@ -30,11 +30,43 @@ enum Availability {
   AWAY
 }
 
+enum MessageType {
+  TEXT
+  QUICK
+  REQUEST
+  SYSTEM
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
 model Group {
-  id        String   @id @default(cuid())
-  key       String   @unique
+  id        String    @id @default(cuid())
+  key       String    @unique
   nameKey   String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  messages  Message[]
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  groupId   String
+  group     Group       @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User        @relation(fields: [senderId], references: [id])
+  type      MessageType @default(TEXT)
+  text      String?
+  payload   Json?
+  status    Status?
+  summary   String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([groupId, createdAt])
 }
 
 model User {
@@ -53,4 +85,5 @@ model User {
   availabilityUntil DateTime?
   addOns            String[]         @default([])
   createdAt         DateTime         @default(now())
+  messages          Message[]
 }
