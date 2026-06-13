@@ -1,0 +1,77 @@
+.fdHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 2);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  background: var(--fd-bg);
+}
+
+.fdHeaderBrand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+
+  img {
+    height: calc(var(--fd-space) * 3);
+  }
+}
+
+.fdHeaderTitle {
+  padding-left: calc(var(--fd-space) * 0.75);
+  border-left: 1px solid var(--fd-border);
+  font-size: calc(var(--fd-font) * 0.93);
+  font-weight: 600;
+}
+
+.fdToggle {
+  display: flex;
+  padding: calc(var(--fd-space) * 0.25);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-surface);
+}
+
+.fdToggleBtn {
+  padding: calc(var(--fd-space) * 0.5) calc(var(--fd-space) * 1.5);
+  border: 0;
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: none;
+  color: color-mix(in srgb, var(--fd-text), transparent 25%);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fdToggleOn {
+  background: var(--fd-bg);
+  color: var(--fd-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+}
+
+.fdHeaderUser {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+}
+
+.fdAvatar {
+  display: flex;
+  width: calc(var(--fd-space) * 3.5);
+  height: calc(var(--fd-space) * 3.5);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-primary);
+  color: #fff;
+  font-size: calc(var(--fd-font) * 0.93);
+  font-weight: 700;
+}
+
+@media (max-width: 36rem) {
+  .fdHeaderTitle {
+    display: none;
+  }
+}

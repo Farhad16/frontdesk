@@ -5,6 +5,8 @@ import {useAuth} from './auth/AuthContext'
 import {GroupsEmpty} from './groups/GroupsEmpty'
 import {GroupsPage} from './groups/GroupsPage'
 import {Thread} from './groups/Thread'
+import {getViewMode} from './lib/viewMode'
+import {QueuePage} from './queue/QueuePage'
 
 export default function App() {
   const {user, loading} = useAuth()
@@ -26,13 +28,16 @@ export default function App() {
 
   if (!user) return <AuthPage />
 
+  const home = getViewMode(user.role) === 'queue' ? '/queue' : '/groups'
+
   return (
     <Routes>
       <Route path="/groups" element={<GroupsPage />}>
         <Route index element={<GroupsEmpty />} />
         <Route path=":key" element={<Thread />} />
       </Route>
-      <Route path="*" element={<Navigate to="/groups" replace />} />
+      <Route path="/queue" element={<QueuePage />} />
+      <Route path="*" element={<Navigate to={home} replace />} />
     </Routes>
   )
 }

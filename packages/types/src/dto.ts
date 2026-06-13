@@ -49,6 +49,10 @@ export interface IStatusUpdateResult {
   message: IMessage
   system: IMessage
 }
+export interface IRequestQueueItem {
+  groupKey: string
+  message: IMessage
+}
 
 export interface ICurrentUser {
   id: string

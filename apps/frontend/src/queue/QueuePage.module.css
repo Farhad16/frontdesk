@@ -1,0 +1,176 @@
+.fdQueue {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--fd-surface);
+}
+
+.fdQueueFilters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 2);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  background: var(--fd-bg);
+}
+
+.fdChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--fd-space) * 0.5);
+}
+
+.fdChip {
+  padding: calc(var(--fd-space) * 0.4) var(--fd-space);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-bg);
+  color: color-mix(in srgb, var(--fd-text), transparent 20%);
+  font-size: calc(var(--fd-font) * 0.82);
+  cursor: pointer;
+}
+
+.fdChipOn {
+  border-color: var(--fd-primary);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  color: var(--fd-primary);
+  font-weight: 600;
+}
+
+.fdSearch {
+  max-width: 18rem;
+}
+
+.fdQueueBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(var(--fd-space) * 1.5);
+}
+
+.fdQueueState {
+  padding: calc(var(--fd-space) * 3);
+  color: color-mix(in srgb, var(--fd-text), transparent 40%);
+  text-align: center;
+}
+
+.fdTable {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  border-radius: var(--fd-radius);
+  background: var(--fd-bg);
+  overflow: hidden;
+}
+
+.fdRow {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 2.2fr 0.7fr 1fr 1.4fr;
+  gap: var(--fd-space);
+  align-items: center;
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 55%);
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
+.fdHead {
+  background: var(--fd-surface);
+  color: color-mix(in srgb, var(--fd-text), transparent 25%);
+  font-size: calc(var(--fd-font) * 0.79);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fdMember {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  font-weight: 600;
+}
+
+.fdAvatar {
+  display: flex;
+  width: calc(var(--fd-space) * 3);
+  height: calc(var(--fd-space) * 3);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-primary);
+  color: #fff;
+  font-size: calc(var(--fd-font) * 0.72);
+  font-weight: 700;
+}
+
+.fdRequest {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fdStatusChip {
+  padding: calc(var(--fd-space) * 0.25) calc(var(--fd-space) * 0.75);
+  border-radius: var(--fd-radius);
+  font-size: calc(var(--fd-font) * 0.79);
+  font-weight: 600;
+
+  &[data-status='pending'] {
+    background: color-mix(in srgb, #b45309, var(--fd-bg) 85%);
+    color: #b45309;
+  }
+
+  &[data-status='in_progress'] {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 85%);
+    color: var(--fd-primary);
+  }
+
+  &[data-status='done'] {
+    background: color-mix(in srgb, #15803d, var(--fd-bg) 85%);
+    color: #15803d;
+  }
+
+  &[data-status='cancelled'] {
+    background: color-mix(in srgb, var(--fd-error), var(--fd-bg) 85%);
+    color: var(--fd-error);
+  }
+}
+
+.fdActionsCell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--fd-space) * 0.5);
+}
+
+/* Mobile: each row becomes a stacked card with inline labels. */
+@media (max-width: 48rem) {
+  .fdHead {
+    display: none;
+  }
+
+  .fdTable {
+    border: 0;
+    background: transparent;
+    gap: var(--fd-space);
+  }
+
+  .fdRow {
+    grid-template-columns: 1fr;
+    gap: calc(var(--fd-space) * 0.5);
+    border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+    border-radius: var(--fd-radius);
+    background: var(--fd-bg);
+  }
+
+  .fdGroupCell::before,
+  .fdTimeCell::before,
+  .fdStatusCell::before {
+    content: attr(data-label) ': ';
+    color: color-mix(in srgb, var(--fd-text), transparent 40%);
+    font-size: calc(var(--fd-font) * 0.79);
+  }
+
+  .fdRequest {
+    white-space: normal;
+  }
+}

@@ -8,6 +8,7 @@ import {
   GROUP_CONFIGS,
   type IMessage,
   type IMessagePayload,
+  type IRequestQueueItem,
   type IStatusUpdateResult,
   type Role,
   type Status,
@@ -71,6 +72,15 @@ export class MessagesService {
     const mapped = toMessage(message)
     this.events.emit({type: 'message:new', groupKey, message: mapped})
     return mapped
+  }
+
+  async listRequests(): Promise<IRequestQueueItem[]> {
+    const messages = await this.prisma.message.findMany({
+      where: {type: 'REQUEST'},
+      orderBy: {createdAt: 'desc'},
+      include: {sender: true, group: true},
+    })
+    return messages.map(message => ({groupKey: message.group.key, message: toMessage(message)}))
   }
 
   async updateStatus(

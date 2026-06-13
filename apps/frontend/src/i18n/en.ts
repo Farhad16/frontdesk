@@ -106,6 +106,22 @@ export const en = {
   'status.start': 'Start',
   'status.markDone': 'Mark done',
   'status.cancel': 'Cancel',
+
+  'view.thread': 'Groups',
+  'view.queue': 'Queue',
+
+  'queue.title': 'Request queue',
+  'queue.empty': 'No requests match.',
+  'queue.searchPlaceholder': 'Search by name',
+  'queue.filterAllStatus': 'All status',
+  'queue.filterAllGroups': 'All groups',
+  'queue.today': 'Today',
+  'queue.colMember': 'Member',
+  'queue.colGroup': 'Group',
+  'queue.colRequest': 'Request',
+  'queue.colTime': 'Time',
+  'queue.colStatus': 'Status',
+  'queue.colActions': 'Actions',
 } as const
 
 export type TranslationKey = keyof typeof en
