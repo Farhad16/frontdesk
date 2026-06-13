@@ -103,6 +103,8 @@ export const en = {
   'builder.remove': 'Remove',
   'builder.send': 'Send order',
   'builder.close': 'Close',
+  'builder.saveQuickPick': '★ Save as Quick Pick',
+  'builder.updateQuickPick': '★ Update Quick Pick',
 
   'status.pending': 'Pending',
   'status.in_progress': 'In progress',

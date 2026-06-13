@@ -74,6 +74,10 @@ export interface ISignupInput {
   email: string
   password: string
 }
+export interface IUserPreference {
+  itemKey: string
+  options: Record<string, string | string[]>
+}
 export interface IOAuthProfile {
   email: string
   name: string

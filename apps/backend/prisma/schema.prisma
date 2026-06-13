@@ -52,6 +52,17 @@ model Group {
   messages  Message[]
 }
 
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemKey   String
+  options   Json
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemKey])
+}
+
 model PushSubscription {
   id        String   @id @default(cuid())
   userId    String
@@ -99,4 +110,5 @@ model User {
   createdAt         DateTime         @default(now())
   messages          Message[]
   pushSubscriptions PushSubscription[]
+  preferences       UserPreference[]
 }

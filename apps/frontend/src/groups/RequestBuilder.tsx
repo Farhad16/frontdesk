@@ -4,6 +4,7 @@ import {useMemo, useState} from 'react'
 import {useAuth} from '../auth/AuthContext'
 import {t} from '../i18n'
 import {buildLineSummary} from './builderSummary'
+import {usePreferences} from './usePreferences'
 import styles from './RequestBuilder.module.css'
 import type {ISendRequestInput} from './useThread'
 
@@ -16,6 +17,7 @@ interface IRequestBuilderProps {
 
 export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuilderProps) {
   const {user} = useAuth()
+  const {find, save} = usePreferences()
   const catalog = config.catalog ?? []
 
   const [categoryKey, setCategoryKey] = useState(catalog[0]?.key ?? '')
@@ -53,9 +55,28 @@ export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuild
 
   function selectItem(key: string) {
     setItemKey(key)
-    setSelections({})
     setQuantity(1)
-    setAddOns([])
+    const pref = find(key)
+    if (pref) {
+      const sel: Record<string, string> = {}
+      let prefAddOns: string[] = []
+      Object.entries(pref.options).forEach(([optKey, value]) => {
+        if (optKey === 'addOns' && Array.isArray(value)) prefAddOns = value
+        else if (typeof value === 'string') sel[optKey] = value
+      })
+      setSelections(sel)
+      setAddOns(prefAddOns)
+    } else {
+      setSelections({})
+      setAddOns([])
+    }
+  }
+
+  function saveQuickPick() {
+    if (!item) return
+    const options: IRequestLineItem['options'] = {...selections}
+    if (addOns.length > 0) options.addOns = addOns
+    void save(item.key, options)
   }
 
   function toggleAddOn(value: string) {
@@ -235,14 +256,19 @@ export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuild
             </div>
           ) : (
             item && (
-              <WuButton
-                variant="outline"
-                className={styles.fdAddItem}
-                disabled={!requiredMet}
-                onClick={addItemLine}
-              >
-                {t('builder.addToOrder')}
-              </WuButton>
+              <div className={styles.fdItemActions}>
+                <WuButton variant="outline" disabled={!requiredMet} onClick={addItemLine}>
+                  {t('builder.addToOrder')}
+                </WuButton>
+                <button
+                  type="button"
+                  className={styles.fdQuickPickSave}
+                  disabled={!requiredMet}
+                  onClick={saveQuickPick}
+                >
+                  {find(item.key) ? t('builder.updateQuickPick') : t('builder.saveQuickPick')}
+                </button>
+              </div>
             )
           )}
 

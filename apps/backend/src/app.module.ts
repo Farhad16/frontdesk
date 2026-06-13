@@ -5,6 +5,7 @@ import {EventsModule} from './events/events.module'
 import {GroupsModule} from './groups/groups.module'
 import {HealthController} from './health/health.controller'
 import {MessagesModule} from './messages/messages.module'
+import {PreferencesModule} from './preferences/preferences.module'
 import {PrismaModule} from './prisma/prisma.module'
 import {PushModule} from './push/push.module'
 import {UsersModule} from './users/users.module'
@@ -18,6 +19,7 @@ import {UsersModule} from './users/users.module'
     AuthModule,
     GroupsModule,
     MessagesModule,
+    PreferencesModule,
     UsersModule,
   ],
   controllers: [HealthController],

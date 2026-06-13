@@ -126,6 +126,29 @@
   align-self: flex-start;
 }
 
+.fdItemActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fd-space);
+}
+
+.fdQuickPickSave {
+  padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 0.9);
+  border: 0;
+  background: none;
+  color: var(--fd-primary);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
+
 .fdCart {
   display: flex;
   flex-direction: column;
