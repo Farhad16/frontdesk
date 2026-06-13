@@ -1,0 +1,99 @@
+import {WuButton, WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {Fragment, useEffect, useRef, useState, type FormEvent} from 'react'
+import {useNavigate, useParams} from 'react-router-dom'
+import {useAuth} from '../auth/AuthContext'
+import {t} from '../i18n'
+import {MessageBubble} from './MessageBubble'
+import {dayKey, dayLabel} from './threadFormat'
+import {useGroups} from './useGroups'
+import {useThread} from './useThread'
+import styles from './Thread.module.css'
+
+export function Thread() {
+  const {key = ''} = useParams()
+  const navigate = useNavigate()
+  const {user} = useAuth()
+  const {groups} = useGroups()
+  const {messages, loading, error, sending, send} = useThread(key)
+  const [draft, setDraft] = useState('')
+  const bodyRef = useRef<HTMLDivElement>(null)
+
+  const group = groups.find(item => item.key === key)
+
+  useEffect(() => {
+    bodyRef.current?.scrollTo({top: bodyRef.current.scrollHeight})
+  }, [messages])
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault()
+    const text = draft.trim()
+    if (!text || sending) return
+    setDraft('')
+    try {
+      await send(text)
+    } catch {
+      setDraft(text)
+    }
+  }
+
+  let lastDay = ''
+
+  return (
+    <div className={styles.fdThread}>
+      <header className={styles.fdThreadBar}>
+        <WuButton
+          variant="iconOnly"
+          className={styles.fdThreadBack}
+          Icon={<span aria-hidden="true">‹</span>}
+          aria-label={t('groups.back')}
+          onClick={() => navigate('/groups')}
+        />
+        <span className={styles.fdThreadEmoji} aria-hidden="true">
+          {group?.emoji}
+        </span>
+        <span className={styles.fdThreadName}>{group ? t(group.nameKey) : key}</span>
+      </header>
+
+      <div ref={bodyRef} className={styles.fdThreadBody}>
+        {loading && (
+          <div className={styles.fdThreadState}>
+            <WuLoader size="sm" variant="spinner" />
+          </div>
+        )}
+        {error && <div className={styles.fdThreadState}>{t('thread.loadError')}</div>}
+        {!loading && !error && messages.length === 0 && (
+          <div className={styles.fdThreadState}>{t('thread.empty')}</div>
+        )}
+
+        {messages.map(message => {
+          const key = dayKey(message.createdAt)
+          const newDay = key !== lastDay
+          lastDay = key
+          return (
+            <Fragment key={message.id}>
+              {newDay && (
+                <div className={styles.fdDay}>
+                  <span>{dayLabel(message.createdAt)}</span>
+                </div>
+              )}
+              <MessageBubble message={message} isOwn={message.sender.id === user?.id} />
+            </Fragment>
+          )
+        })}
+      </div>
+
+      <form className={styles.fdComposer} onSubmit={handleSubmit}>
+        <WuInput
+          variant="outlined"
+          type="text"
+          placeholder={t('thread.inputPlaceholder')}
+          value={draft}
+          onChange={event => setDraft(event.target.value)}
+        />
+        <WuButton type="submit" variant="primary" loading={sending} disabled={!draft.trim()}>
+          {t('thread.send')}
+        </WuButton>
+      </form>
+    </div>
+  )
+}

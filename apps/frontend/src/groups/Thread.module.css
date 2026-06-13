@@ -24,7 +24,6 @@
   line-height: 1;
 }
 
-/* Back control only matters on the single-pane mobile layout. */
 @media (min-width: 48rem) {
   .fdThreadBack {
     display: none;
@@ -50,9 +49,44 @@
 .fdThreadBody {
   display: flex;
   flex: 1;
-  align-items: center;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.75);
+  overflow-y: auto;
+  padding: calc(var(--fd-space) * 2);
+  background: var(--fd-surface);
+}
+
+.fdThreadState {
+  margin: auto;
+  color: color-mix(in srgb, var(--fd-text), transparent 40%);
+  font-size: calc(var(--fd-font) * 0.93);
+  text-align: center;
+}
+
+.fdDay {
+  display: flex;
   justify-content: center;
-  padding: calc(var(--fd-space) * 3);
-  color: color-mix(in srgb, var(--fd-text), transparent 45%);
-  font-size: var(--fd-font);
+  margin: var(--fd-space) 0;
+
+  span {
+    padding: calc(var(--fd-space) * 0.4) var(--fd-space);
+    border-radius: var(--fd-radius);
+    background: color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+    color: color-mix(in srgb, var(--fd-text), transparent 25%);
+    font-size: calc(var(--fd-font) * 0.79);
+    font-weight: 600;
+  }
+}
+
+.fdComposer {
+  display: flex;
+  gap: var(--fd-space);
+  align-items: center;
+  padding: calc(var(--fd-space) * 1.5);
+  border-top: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  background: var(--fd-bg);
+
+  > :first-child {
+    flex: 1;
+  }
 }

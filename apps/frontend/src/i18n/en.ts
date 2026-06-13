@@ -38,6 +38,14 @@ export const en = {
   'groups.pickPrompt': 'Pick a group to open its thread',
   'groups.threadComingSoon': 'Thread view is coming soon.',
   'groups.back': 'Back',
+
+  'thread.today': 'Today',
+  'thread.yesterday': 'Yesterday',
+  'thread.empty': 'No messages yet. Start the conversation.',
+  'thread.inputPlaceholder': 'Type a message',
+  'thread.send': 'Send',
+  'thread.staffTag': 'Staff',
+  'thread.loadError': 'Could not load messages.',
 } as const
 
 export type TranslationKey = keyof typeof en

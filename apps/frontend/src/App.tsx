@@ -4,7 +4,7 @@ import {AuthPage} from './auth/AuthPage'
 import {useAuth} from './auth/AuthContext'
 import {GroupsEmpty} from './groups/GroupsEmpty'
 import {GroupsPage} from './groups/GroupsPage'
-import {ThreadPlaceholder} from './groups/ThreadPlaceholder'
+import {Thread} from './groups/Thread'
 
 export default function App() {
   const {user, loading} = useAuth()
@@ -30,7 +30,7 @@ export default function App() {
     <Routes>
       <Route path="/groups" element={<GroupsPage />}>
         <Route index element={<GroupsEmpty />} />
-        <Route path=":key" element={<ThreadPlaceholder />} />
+        <Route path=":key" element={<Thread />} />
       </Route>
       <Route path="*" element={<Navigate to="/groups" replace />} />
     </Routes>

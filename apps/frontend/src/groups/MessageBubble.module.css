@@ -1,0 +1,126 @@
+.fdSystem {
+  align-self: center;
+  padding: calc(var(--fd-space) * 0.4) var(--fd-space);
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: calc(var(--fd-font) * 0.79);
+  text-align: center;
+}
+
+.fdRow {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--fd-space) * 0.75);
+  max-width: 85%;
+}
+
+.fdRowOwn {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.fdRowAvatar {
+  display: flex;
+  width: calc(var(--fd-space) * 3.5);
+  height: calc(var(--fd-space) * 3.5);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-primary);
+  color: #fff;
+  font-size: calc(var(--fd-font) * 0.79);
+  font-weight: 700;
+}
+
+.fdBubble {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
+  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  border-radius: calc(var(--fd-radius) * 1.5);
+  border-bottom-left-radius: calc(var(--fd-radius) * 0.5);
+  background: var(--fd-bg);
+}
+
+.fdBubbleOwn {
+  border-color: transparent;
+  border-radius: calc(var(--fd-radius) * 1.5);
+  border-bottom-right-radius: calc(var(--fd-radius) * 0.5);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 86%);
+}
+
+.fdSender {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+  color: var(--fd-primary);
+  font-size: calc(var(--fd-font) * 0.82);
+  font-weight: 700;
+}
+
+.fdSenderTag {
+  padding: 0 calc(var(--fd-space) * 0.4);
+  border-radius: calc(var(--fd-radius) * 0.5);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 80%);
+  color: var(--fd-primary);
+  font-size: calc(var(--fd-font) * 0.72);
+  font-weight: 600;
+}
+
+.fdText {
+  color: var(--fd-text);
+  font-size: var(--fd-font);
+  overflow-wrap: anywhere;
+}
+
+.fdRequest {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+}
+
+.fdRequestSummary {
+  font-size: var(--fd-font);
+  font-weight: 600;
+}
+
+.fdRequestLine {
+  color: var(--fd-text);
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
+.fdStatus {
+  align-self: flex-start;
+  margin-top: calc(var(--fd-space) * 0.4);
+  padding: calc(var(--fd-space) * 0.25) calc(var(--fd-space) * 0.75);
+  border-radius: var(--fd-radius);
+  font-size: calc(var(--fd-font) * 0.79);
+  font-weight: 600;
+
+  &[data-status='pending'] {
+    background: color-mix(in srgb, #b45309, var(--fd-bg) 85%);
+    color: #b45309;
+  }
+
+  &[data-status='in_progress'] {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 85%);
+    color: var(--fd-primary);
+  }
+
+  &[data-status='done'] {
+    background: color-mix(in srgb, #15803d, var(--fd-bg) 85%);
+    color: #15803d;
+  }
+
+  &[data-status='cancelled'] {
+    background: color-mix(in srgb, var(--fd-error), var(--fd-bg) 85%);
+    color: var(--fd-error);
+  }
+}
+
+.fdTime {
+  align-self: flex-end;
+  color: color-mix(in srgb, var(--fd-text), transparent 45%);
+  font-size: calc(var(--fd-font) * 0.72);
+}
