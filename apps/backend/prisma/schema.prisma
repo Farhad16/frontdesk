@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  REQUESTER
+  STAFF
+}
+
+enum Provider {
+  GOOGLE
+  PASSWORD
+}
+
+enum NotificationPref {
+  OFF
+  MY_UPDATES
+  NEW_MESSAGES
+  ALL
+}
+
+enum Availability {
+  AVAILABLE
+  BUSY
+  AWAY
+}
+
+model User {
+  id                String           @id @default(cuid())
+  name              String
+  email             String           @unique
+  photoUrl          String?
+  passwordHash      String?
+  provider          Provider         @default(PASSWORD)
+  providerId        String?
+  role              Role             @default(REQUESTER)
+  locale            String           @default("en")
+  notificationPref  NotificationPref @default(ALL)
+  availability      Availability     @default(AVAILABLE)
+  availabilityNote  String?
+  availabilityUntil DateTime?
+  addOns            String[]         @default([])
+  createdAt         DateTime         @default(now())
+}
