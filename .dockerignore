@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+**/.turbo
+**/dev-dist
+**/*.tsbuildinfo
+.git
+docs

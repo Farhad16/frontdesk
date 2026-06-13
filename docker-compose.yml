@@ -15,5 +15,38 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql://hub:hub@db:5432/hub?schema=public
+      API_PORT: "3001"
+      JWT_SECRET: demo-only-change-me
+      ORG_EMAIL_DOMAIN: questionpro.com
+      VAPID_PUBLIC_KEY: BGLIYweG9YvXM0_rVYzp2KTLdKHGWGJdlg_FDgbwKjqu8nJSD9UlfS8jO0qjWZE8LhmVVgXp5yZO9YMiXHEQ1L0
+      VAPID_PRIVATE_KEY: 5hQiDsB8i_UPyfrka5hQOzkm_8N9xw8UHooc5I5Aa6U
+      VAPID_SUBJECT: mailto:demo@frontdesk.local
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+  # Optional HTTPS tunnel for phone push: docker compose --profile tunnel up
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://web:80
+    profiles: ["tunnel"]
+    depends_on:
+      - web
+
 volumes:
   pgdata:
