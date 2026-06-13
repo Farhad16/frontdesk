@@ -1,4 +1,4 @@
-import type {IMessage, IRequestPayload, IStatusUpdateResult, Status} from '@frontdesk/types'
+import type {IMessage, IRequestPayload, ISseEvent, IStatusUpdateResult, Status} from '@frontdesk/types'
 import {useCallback, useEffect, useState} from 'react'
 import {apiClient} from '../lib/apiClient'
 
@@ -18,32 +18,54 @@ interface IThreadState {
   updateStatus: (messageId: string, status: Status) => Promise<void>
 }
 
+function upsert(list: IMessage[], message: IMessage): IMessage[] {
+  const index = list.findIndex(item => item.id === message.id)
+  if (index === -1) return [...list, message]
+  const copy = [...list]
+  copy[index] = message
+  return copy
+}
+
 export function useThread(groupKey: string): IThreadState {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
 
+  const load = useCallback(() => {
+    return apiClient
+      .get<IMessage[]>(`/groups/${groupKey}/messages`)
+      .then(list => setMessages(list))
+      .catch(caught => setError(String(caught)))
+  }, [groupKey])
+
   useEffect(() => {
-    let active = true
     setLoading(true)
     setError(null)
-    apiClient
-      .get<IMessage[]>(`/groups/${groupKey}/messages`)
-      .then(list => active && setMessages(list))
-      .catch(caught => active && setError(String(caught)))
-      .finally(() => active && setLoading(false))
-    return () => {
-      active = false
+    load().finally(() => setLoading(false))
+
+    const source = new EventSource('/api/stream', {withCredentials: true})
+    source.onopen = () => {
+      void load()
     }
-  }, [groupKey])
+    source.onmessage = event => {
+      const data = JSON.parse(event.data) as ISseEvent
+      if ('groupKey' in data && data.groupKey !== groupKey) return
+      if (data.type === 'message:new' || data.type === 'message:status') {
+        setMessages(prev => upsert(prev, data.message))
+      } else if (data.type === 'message:deleted') {
+        setMessages(prev => prev.filter(message => message.id !== data.messageId))
+      }
+    }
+    return () => source.close()
+  }, [groupKey, load])
 
   const send = useCallback(
     async (text: string) => {
       setSending(true)
       try {
         const message = await apiClient.post<IMessage>(`/groups/${groupKey}/messages`, {text})
-        setMessages(prev => [...prev, message])
+        setMessages(prev => upsert(prev, message))
       } finally {
         setSending(false)
       }
@@ -55,11 +77,8 @@ export function useThread(groupKey: string): IThreadState {
     async (input: ISendRequestInput) => {
       setSending(true)
       try {
-        const message = await apiClient.post<IMessage>(
-          `/groups/${groupKey}/messages/request`,
-          input,
-        )
-        setMessages(prev => [...prev, message])
+        const message = await apiClient.post<IMessage>(`/groups/${groupKey}/messages/request`, input)
+        setMessages(prev => upsert(prev, message))
       } finally {
         setSending(false)
       }
@@ -73,10 +92,7 @@ export function useThread(groupKey: string): IThreadState {
         `/groups/${groupKey}/messages/${messageId}/status`,
         {status},
       )
-      setMessages(prev => [
-        ...prev.map(message => (message.id === result.message.id ? result.message : message)),
-        result.system,
-      ])
+      setMessages(prev => upsert(upsert(prev, result.message), result.system))
     },
     [groupKey],
   )
