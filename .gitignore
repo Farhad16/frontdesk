@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+.env
+*.local
+.DS_Store
+coverage/
+*.log
+apps/frontend/dev-dist/
+
+# typescript build cache
+*.tsbuildinfo
+
+# local-only product docs
+docs/
