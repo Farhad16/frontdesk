@@ -149,7 +149,8 @@ export class MessagesService {
     const result = {message: toMessage(updated), system: toMessage(system)}
     this.events.emit({type: 'message:status', groupKey, message: result.message})
     this.events.emit({type: 'message:new', groupKey, message: result.system})
-    void this.push.notifyOwnerUpdate(actor.id, result.message.sender.id, groupKey, result.message)
+    // Notify the request owner of their update (the system line carries who + what).
+    void this.push.notifyOwnerUpdate(actor.id, result.message.sender.id, groupKey, result.system)
     return result
   }
 
