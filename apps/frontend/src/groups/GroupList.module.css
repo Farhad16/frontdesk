@@ -1,0 +1,81 @@
+.fdGroupList {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.fdGroupSearch {
+  padding: calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+}
+
+.fdGroupState {
+  padding: calc(var(--fd-space) * 2);
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: calc(var(--fd-font) * 0.93);
+  text-align: center;
+}
+
+.fdGroupItems {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.fdGroupItem {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 1.5);
+  padding: calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 55%);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: var(--fd-surface);
+  }
+}
+
+.fdGroupItemActive {
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 92%);
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  }
+}
+
+.fdGroupEmoji {
+  display: flex;
+  width: calc(var(--fd-space) * 5);
+  height: calc(var(--fd-space) * 5);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 1.5);
+}
+
+.fdGroupText {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  min-width: 0;
+}
+
+.fdGroupName {
+  color: var(--fd-text);
+  font-size: var(--fd-font);
+  font-weight: 600;
+}
+
+.fdGroupPreview {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--fd-text), transparent 40%);
+  font-size: calc(var(--fd-font) * 0.86);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

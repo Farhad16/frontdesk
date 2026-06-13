@@ -1,0 +1,10 @@
+.fdGroupsEmpty {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--fd-space) * 3);
+  color: color-mix(in srgb, var(--fd-text), transparent 45%);
+  font-size: var(--fd-font);
+  text-align: center;
+}

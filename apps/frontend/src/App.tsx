@@ -1,10 +1,13 @@
-import {WuButton, WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {Navigate, Route, Routes} from 'react-router-dom'
 import {AuthPage} from './auth/AuthPage'
 import {useAuth} from './auth/AuthContext'
-import {t} from './i18n'
+import {GroupsEmpty} from './groups/GroupsEmpty'
+import {GroupsPage} from './groups/GroupsPage'
+import {ThreadPlaceholder} from './groups/ThreadPlaceholder'
 
 export default function App() {
-  const {user, loading, logout} = useAuth()
+  const {user, loading} = useAuth()
 
   if (loading) {
     return (
@@ -24,14 +27,12 @@ export default function App() {
   if (!user) return <AuthPage />
 
   return (
-    <div style={{padding: 24}}>
-      <h1>{t('auth.brand')}</h1>
-      <p>
-        {t('home.loggedInAs')} <strong>{user.name}</strong> ({user.role})
-      </p>
-      <WuButton variant="outline" onClick={logout}>
-        {t('home.logout')}
-      </WuButton>
-    </div>
+    <Routes>
+      <Route path="/groups" element={<GroupsPage />}>
+        <Route index element={<GroupsEmpty />} />
+        <Route path=":key" element={<ThreadPlaceholder />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/groups" replace />} />
+    </Routes>
   )
 }

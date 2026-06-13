@@ -26,6 +26,18 @@ export const en = {
   'auth.googleComingSoon': 'Google sign-in is coming soon.',
   'home.loggedInAs': 'Logged in as',
   'home.logout': 'Log out',
+
+  'group.requests': 'Requests',
+  'group.breakfast': 'Breakfast',
+  'group.lunch': 'Lunch',
+
+  'groups.title': 'Groups',
+  'groups.searchPlaceholder': 'Search groups',
+  'groups.noResults': 'No groups match your search.',
+  'groups.noMessages': 'No messages yet',
+  'groups.pickPrompt': 'Pick a group to open its thread',
+  'groups.threadComingSoon': 'Thread view is coming soon.',
+  'groups.back': 'Back',
 } as const
 
 export type TranslationKey = keyof typeof en
