@@ -1,4 +1,4 @@
-import type {IMessage, IRequestPayload, Role, Status} from '@frontdesk/types'
+import type {ILunchOffPayload, IMessage, IRequestPayload, Role, Status} from '@frontdesk/types'
 import {t} from '../i18n'
 import {actionsFor} from './statusActions'
 import {formatTime} from './threadFormat'
@@ -6,6 +6,24 @@ import styles from './MessageBubble.module.css'
 
 function isRequestPayload(payload: IMessage['payload']): payload is IRequestPayload {
   return Boolean(payload && 'items' in payload)
+}
+
+function isLunchOffPayload(payload: IMessage['payload']): payload is ILunchOffPayload {
+  return Boolean(payload && 'lunchOff' in payload)
+}
+
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleDateString([], {day: 'numeric', month: 'short'})
+}
+
+function lunchOffText(payload: ILunchOffPayload): string {
+  const prefix = payload.scope === 'office' ? t('lunchoff.office') : t('lunchoff.mine')
+  const {from, to} = payload.lunchOff
+  const when =
+    from === to
+      ? `${t('lunchoff.on')} ${fmtDate(from)}`
+      : `${t('lunchoff.from')} ${fmtDate(from)} ${t('lunchoff.to')} ${fmtDate(to)}`
+  return `${prefix} ${when}`
 }
 
 const ACTION_GLYPH: Record<Status, string> = {
@@ -114,6 +132,8 @@ export function MessageBubble({
                 )
               })()}
           </div>
+        ) : isLunchOffPayload(message.payload) ? (
+          <span className={styles.fdText}>{lunchOffText(message.payload)}</span>
         ) : (
           <span className={styles.fdText}>
             {message.type === 'QUICK' && message.text

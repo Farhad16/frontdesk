@@ -26,6 +26,30 @@
   }
 }
 
+.dateRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5) 0;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  color: color-mix(in srgb, var(--fd-text), transparent 25%);
+  font-size: calc(var(--fd-font) * 0.79);
+
+  input {
+    padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 0.6);
+    border: 1px solid var(--fd-border);
+    border-radius: var(--fd-radius);
+    font: inherit;
+    font-size: calc(var(--fd-font) * 0.86);
+  }
+}
+
 .composer {
   display: flex;
   gap: var(--fd-space);

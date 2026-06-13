@@ -3,6 +3,7 @@ import type {IMessage, IStatusUpdateResult} from '@frontdesk/types'
 import {CurrentUser} from '../auth/decorators/current-user.decorator'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import type {AuthUser} from '../auth/jwt.strategy'
+import {LunchOffDto} from './dto/lunch-off.dto'
 import {SendMessageDto} from './dto/message.dto'
 import {QuickActionDto} from './dto/quick.dto'
 import {CreateRequestDto} from './dto/request.dto'
@@ -35,6 +36,15 @@ export class MessagesController {
     @Body() dto: CreateRequestDto,
   ): Promise<IMessage> {
     return this.messages.createRequest(key, user.id, dto)
+  }
+
+  @Post('lunch-off')
+  createLunchOff(
+    @Param('key') key: string,
+    @CurrentUser() user: AuthUser,
+    @Body() dto: LunchOffDto,
+  ): Promise<IMessage> {
+    return this.messages.createLunchOff(key, user, dto.from, dto.to)
   }
 
   @Post('quick')

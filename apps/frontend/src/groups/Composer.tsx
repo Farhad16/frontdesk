@@ -10,17 +10,29 @@ import styles from './Composer.module.css'
 export function Composer({groupKey}: {groupKey: string}) {
   const {user} = useAuth()
   const config = useGroupConfig(groupKey)
-  const {sending, sendText, sendQuick, sendRequest} = useCompose(groupKey)
+  const {sending, sendText, sendQuick, sendRequest, sendLunchOff} = useCompose(groupKey)
   const [draft, setDraft] = useState('')
   const [builderOpen, setBuilderOpen] = useState(false)
+  const [dateOpen, setDateOpen] = useState(false)
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
 
+  const roleVisible = (visibleToRole?: string) => !visibleToRole || visibleToRole === user?.role
   const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
   const quickActions = (config?.quickActions ?? []).filter(
-    action =>
-      action.messageKey &&
-      !action.opensDatePicker &&
-      (!action.visibleToRole || action.visibleToRole === user?.role),
+    action => action.messageKey && !action.opensDatePicker && roleVisible(action.visibleToRole),
   )
+  const dateAction = (config?.quickActions ?? []).find(
+    action => action.opensDatePicker && roleVisible(action.visibleToRole),
+  )
+
+  async function postLunchOff() {
+    if (!from) return
+    await sendLunchOff(from, to || from)
+    setDateOpen(false)
+    setFrom('')
+    setTo('')
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -36,7 +48,7 @@ export function Composer({groupKey}: {groupKey: string}) {
 
   return (
     <>
-      {quickActions.length > 0 && (
+      {(quickActions.length > 0 || dateAction) && (
         <div className={styles.quickRow}>
           {quickActions.map(action => (
             <button
@@ -49,6 +61,31 @@ export function Composer({groupKey}: {groupKey: string}) {
               {t(`quick.${action.key}`)}
             </button>
           ))}
+          {dateAction && (
+            <button
+              type="button"
+              className={styles.quickBtn}
+              onClick={() => setDateOpen(open => !open)}
+            >
+              {t(`quick.${dateAction.key}`)}
+            </button>
+          )}
+        </div>
+      )}
+
+      {dateOpen && (
+        <div className={styles.dateRow}>
+          <label className={styles.dateField}>
+            {t('lunchoff.from')}
+            <input type="date" value={from} onChange={event => setFrom(event.target.value)} />
+          </label>
+          <label className={styles.dateField}>
+            {t('lunchoff.to')}
+            <input type="date" value={to} onChange={event => setTo(event.target.value)} />
+          </label>
+          <WuButton size="sm" variant="primary" disabled={!from} onClick={postLunchOff}>
+            {t('lunchoff.post')}
+          </WuButton>
         </div>
       )}
 

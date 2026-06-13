@@ -8,6 +8,7 @@ interface IComposeState {
   sendText: (text: string) => Promise<void>
   sendQuick: (quickActionKey: string) => Promise<void>
   sendRequest: (input: ISendRequestInput) => Promise<void>
+  sendLunchOff: (from: string, to: string) => Promise<void>
 }
 
 // Post-only composer hook (no fetch/SSE). The open thread receives the new
@@ -46,5 +47,12 @@ export function useCompose(groupKey: string): IComposeState {
     [groupKey],
   )
 
-  return {sending, sendText, sendQuick, sendRequest}
+  const sendLunchOff = useCallback(
+    async (from: string, to: string) => {
+      await apiClient.post<IMessage>(`/groups/${groupKey}/messages/lunch-off`, {from, to})
+    },
+    [groupKey],
+  )
+
+  return {sending, sendText, sendQuick, sendRequest, sendLunchOff}
 }

@@ -79,6 +79,33 @@ export class MessagesService {
     return mapped
   }
 
+  async createLunchOff(
+    groupKey: string,
+    actor: {id: string; role: Role},
+    from: string,
+    to: string,
+  ): Promise<IMessage> {
+    const group = await this.requireGroup(groupKey)
+    const scope = actor.role === 'STAFF' ? 'office' : 'me'
+    const sameDay = from === to
+    const who = scope === 'office' ? 'Office lunch off' : 'My lunch will be off'
+    const when = sameDay ? `on ${from}` : `from ${from} to ${to}`
+    const message = await this.prisma.message.create({
+      data: {
+        groupId: group.id,
+        senderId: actor.id,
+        type: 'QUICK',
+        summary: `${who} ${when}`,
+        payload: {lunchOff: {from, to}, scope} as unknown as Prisma.InputJsonValue,
+      },
+      include: {sender: true},
+    })
+    const mapped = toMessage(message)
+    this.events.emit({type: 'message:new', groupKey, message: mapped})
+    void this.push.notifyNewMessage(actor.id, groupKey, mapped)
+    return mapped
+  }
+
   async createRequest(groupKey: string, senderId: string, dto: CreateRequestDto): Promise<IMessage> {
     const group = await this.requireGroup(groupKey)
     const tracksStatus = GROUP_CONFIGS[groupKey]?.statusTracking ?? false
