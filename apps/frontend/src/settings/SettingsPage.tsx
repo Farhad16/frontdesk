@@ -34,7 +34,7 @@ const AVAILABILITY_OPTIONS: Array<{value: Availability; labelKey: string}> = [
 ]
 
 export function SettingsPage() {
-  const {user, updateUser} = useAuth()
+  const {user, updateUser, logout} = useAuth()
   const {setLocale} = useLanguage()
   const {preferences, remove} = usePreferences()
   const [addOnDraft, setAddOnDraft] = useState('')
@@ -45,13 +45,30 @@ export function SettingsPage() {
   if (!user) return null
   const isStaff = user.role === 'STAFF'
 
-  const sections: Array<{key: SectionKey; labelKey: string}> = [
-    {key: 'profile', labelKey: 'settings.profile'},
-    {key: 'language', labelKey: 'settings.language'},
-    {key: 'notifications', labelKey: 'settings.notifications'},
-    ...(isStaff ? [{key: 'availability' as const, labelKey: 'settings.availability'}] : []),
-    {key: 'quickPicks', labelKey: 'settings.quickPicks'},
-    {key: 'addOns', labelKey: 'settings.addOns'},
+  const notifValue = NOTIF_OPTIONS.find(o => o.value === user.notificationPref)
+  const availValue = AVAILABILITY_OPTIONS.find(o => o.value === user.availability)
+
+  const sections: Array<{key: SectionKey; labelKey: string; icon: string; value?: string}> = [
+    {key: 'profile', labelKey: 'settings.profile', icon: '👤'},
+    {key: 'language', labelKey: 'settings.language', icon: '🌐', value: user.locale === 'bn' ? 'বাংলা' : 'English'},
+    {
+      key: 'notifications',
+      labelKey: 'settings.notifications',
+      icon: '🔔',
+      value: isStaff ? t('settings.notifAll') : notifValue ? t(notifValue.labelKey) : undefined,
+    },
+    ...(isStaff
+      ? [
+          {
+            key: 'availability' as const,
+            labelKey: 'settings.availability',
+            icon: '🟢',
+            value: availValue ? t(availValue.labelKey) : undefined,
+          },
+        ]
+      : []),
+    {key: 'quickPicks', labelKey: 'settings.quickPicks', icon: '⭐', value: String(preferences.length)},
+    {key: 'addOns', labelKey: 'settings.addOns', icon: '🧩', value: String(user.addOns.length)},
   ]
 
   function open(section: SectionKey) {
@@ -85,6 +102,17 @@ export function SettingsPage() {
       <div className={styles.fdShell} data-detail={detailOpen}>
         <nav className={styles.fdNav}>
           <h1 className={styles.fdNavTitle}>{t('settings.title')}</h1>
+
+          <div className={styles.fdNavProfile}>
+            <span className={styles.fdNavAvatar}>{user.name.charAt(0).toUpperCase()}</span>
+            <span className={styles.fdNavProfileText}>
+              <span className={styles.fdNavProfileName}>{user.name}</span>
+              <span className={styles.fdNavProfileMeta}>
+                {user.email} · {user.role}
+              </span>
+            </span>
+          </div>
+
           {sections.map(section => (
             <button
               key={section.key}
@@ -94,9 +122,27 @@ export function SettingsPage() {
               }
               onClick={() => open(section.key)}
             >
-              {t(section.labelKey)}
+              <span className={styles.fdNavIcon} aria-hidden="true">
+                {section.icon}
+              </span>
+              <span className={styles.fdNavLabel}>{t(section.labelKey)}</span>
+              {section.value && <span className={styles.fdNavValue}>{section.value}</span>}
+              <span className={styles.fdNavChevron} aria-hidden="true">
+                ›
+              </span>
             </button>
           ))}
+
+          <button
+            type="button"
+            className={`${styles.fdNavItem} ${styles.fdNavLogout}`}
+            onClick={() => void logout()}
+          >
+            <span className={styles.fdNavIcon} aria-hidden="true">
+              🚪
+            </span>
+            <span className={styles.fdNavLabel}>{t('home.logout')}</span>
+          </button>
         </nav>
 
         <section className={styles.fdContent}>
