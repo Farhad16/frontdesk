@@ -5,8 +5,8 @@ import * as bcrypt from 'bcrypt'
 const prisma = new PrismaClient()
 
 const staffMembers = [
-  {name: 'Karim', email: 'karim@kitchen.local'},
-  {name: 'Rofiq', email: 'rofiq@kitchen.local'},
+  {name: 'Hridoy', email: 'hridoy@kitchen.local'},
+  {name: 'Yousuf', email: 'yousuf@kitchen.local'},
 ]
 
 async function main() {
@@ -14,8 +14,8 @@ async function main() {
   for (const staff of staffMembers) {
     await prisma.user.upsert({
       where: {email: staff.email},
-      update: {},
-      create: {...staff, role: 'STAFF', provider: 'PASSWORD', passwordHash},
+      update: {locale: 'bn'},
+      create: {...staff, role: 'STAFF', provider: 'PASSWORD', passwordHash, locale: 'bn'},
     })
   }
 
