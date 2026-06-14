@@ -1,7 +1,21 @@
 import {Injectable} from '@nestjs/common'
-import type {IUserPreference} from '@frontdesk/types'
+import {GROUP_CONFIGS, SEEDED_GROUP_KEYS, type IUserPreference} from '@frontdesk/types'
 import type {Prisma} from '@prisma/client'
 import {PrismaService} from '../prisma/prisma.service'
+
+function buildItemCategoryMap(): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const key of SEEDED_GROUP_KEYS) {
+    for (const category of GROUP_CONFIGS[key]?.catalog ?? []) {
+      for (const item of category.items ?? []) {
+        if (!map.has(item.key)) map.set(item.key, category.key)
+      }
+    }
+  }
+  return map
+}
+
+const ITEM_CATEGORY = buildItemCategoryMap()
 
 @Injectable()
 export class PreferencesService {
@@ -23,10 +37,14 @@ export class PreferencesService {
     isDefault = false,
   ): Promise<IUserPreference> {
     const data = options as unknown as Prisma.InputJsonValue
-    // Only one default at a time.
+    // One default per section (category) — unset other defaults in the same category.
     if (isDefault) {
+      const category = ITEM_CATEGORY.get(itemKey)
+      const sameCategoryKeys = [...ITEM_CATEGORY.entries()]
+        .filter(([, cat]) => cat === category)
+        .map(([item]) => item)
       await this.prisma.userPreference.updateMany({
-        where: {userId, isDefault: true},
+        where: {userId, isDefault: true, itemKey: {in: sameCategoryKeys}},
         data: {isDefault: false},
       })
     }

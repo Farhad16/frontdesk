@@ -112,6 +112,82 @@
   overflow: hidden;
 }
 
+.fdDateField {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+  color: color-mix(in srgb, var(--fd-text), transparent 25%);
+  font-size: calc(var(--fd-font) * 0.82);
+
+  input {
+    padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 0.75);
+    border: 1px solid var(--fd-border);
+    border-radius: var(--fd-radius-pill, 624.9375rem);
+    font: inherit;
+    font-size: calc(var(--fd-font) * 0.86);
+  }
+}
+
+.fdPinned {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+  margin-bottom: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.25);
+  border: 1px solid color-mix(in srgb, var(--fd-primary), transparent 55%);
+  border-radius: var(--fd-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 90%);
+  color: var(--fd-primary);
+  font-size: calc(var(--fd-font) * 0.93);
+  font-weight: 600;
+}
+
+.fdStaffAsk {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  margin-bottom: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.25);
+  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  border-radius: var(--fd-radius);
+  background: var(--fd-bg);
+}
+
+.fdStaffAskText {
+  flex: 1;
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
+.fdSectionTitle {
+  margin: calc(var(--fd-space) * 1.5) 0 calc(var(--fd-space) * 0.75);
+  color: color-mix(in srgb, var(--fd-text), transparent 20%);
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fdSectionTitle:first-child {
+  margin-top: 0;
+}
+
+.fdSectionEmpty {
+  margin: 0;
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  color: color-mix(in srgb, var(--fd-text), transparent 45%);
+  font-size: calc(var(--fd-font) * 0.86);
+}
+
+.fdMsgRow {
+  display: grid;
+  grid-template-columns: 1.4fr 3.6fr 0.8fr;
+  gap: var(--fd-space);
+  align-items: center;
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 55%);
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
 .fdRow {
   display: grid;
   grid-template-columns: 1.1fr 3.6fr 0.6fr 0.9fr 0.9fr;
@@ -215,7 +291,8 @@
     gap: var(--fd-space);
   }
 
-  .fdRow {
+  .fdRow,
+  .fdMsgRow {
     grid-template-columns: 1fr;
     gap: calc(var(--fd-space) * 0.5);
     border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);

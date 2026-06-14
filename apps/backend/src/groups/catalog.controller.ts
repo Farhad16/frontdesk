@@ -1,5 +1,5 @@
 import {Controller, Get, UseGuards} from '@nestjs/common'
-import type {ICatalogItem} from '@frontdesk/types'
+import type {ICatalogItem, ICatalogSection} from '@frontdesk/types'
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard'
 import {GroupsService} from './groups.service'
 
@@ -11,5 +11,10 @@ export class CatalogController {
   @Get('items')
   items(): ICatalogItem[] {
     return this.groups.catalogItems()
+  }
+
+  @Get('sections')
+  sections(): ICatalogSection[] {
+    return this.groups.catalogSections()
   }
 }

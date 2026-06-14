@@ -13,9 +13,10 @@ interface IRequestBuilderProps {
   sending: boolean
   onClose: () => void
   onSend: (input: ISendRequestInput) => Promise<void>
+  initialCart?: IRequestLineItem[]
 }
 
-export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuilderProps) {
+export function RequestBuilder({config, sending, onClose, onSend, initialCart}: IRequestBuilderProps) {
   const {user, updateUser} = useAuth()
   const {find, save} = usePreferences()
   const catalog = config.catalog ?? []
@@ -27,7 +28,7 @@ export function RequestBuilder({config, sending, onClose, onSend}: IRequestBuild
   const [addOns, setAddOns] = useState<string[]>([])
   const [addOnDraft, setAddOnDraft] = useState('')
   const [freeText, setFreeText] = useState('')
-  const [cart, setCart] = useState<IRequestLineItem[]>([])
+  const [cart, setCart] = useState<IRequestLineItem[]>(initialCart ?? [])
 
   const category = catalog.find(cat => cat.key === categoryKey)
   const item = category?.items?.find(it => it.key === itemKey)

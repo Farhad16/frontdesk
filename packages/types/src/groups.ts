@@ -35,7 +35,9 @@ export const GROUP_CONFIGS: Record<string, IGroupConfig> = {
     emoji: '🍳',
     catalog: BREAKFAST_CATALOG,
     freeText: true,
-    quickActions: [],
+    quickActions: [
+      {key: 'askBreakfast', emoji: '🍳', messageKey: 'breakfast.msg.ask', visibleToRole: 'STAFF'},
+    ],
     statusTracking: false,
   },
   lunch: {

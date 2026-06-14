@@ -1,6 +1,6 @@
 import type {Availability, ICatalogItem, IUserPreference, NotificationPref} from '@frontdesk/types'
 import {WuButton, WuInput} from '@npm-questionpro/wick-ui-lib'
-import {useState} from 'react'
+import {useEffect, useState, type ChangeEvent} from 'react'
 import {useAuth} from '../auth/AuthContext'
 import {AppHeader} from '../components/AppHeader'
 import {useCatalog} from '../groups/useCatalog'
@@ -13,11 +13,19 @@ import styles from './SettingsPage.module.css'
 
 type SectionKey = 'profile' | 'language' | 'notifications' | 'availability' | 'quickPicks' | 'addOns'
 
-function preferenceSummary(options: Record<string, string | string[]>): string {
+function preferenceSummary(
+  options: Record<string, string | string[]>,
+  item?: ICatalogItem,
+): string {
   const parts: string[] = []
   Object.entries(options).forEach(([key, value]) => {
-    if (key === 'addOns' && Array.isArray(value)) parts.push(...value)
-    else if (typeof value === 'string') parts.push(t(`${key}.${value}`))
+    if (key === 'addOns' && Array.isArray(value)) {
+      parts.push(...value)
+      return
+    }
+    if (typeof value !== 'string') return
+    const option = item?.modifiers?.find(m => m.key === key)?.options.find(o => o.key === value)
+    parts.push(option ? t(option.labelKey) : t(`${key}.${value}`))
   })
   return parts.join(' · ')
 }
@@ -39,17 +47,41 @@ export function SettingsPage() {
   const {user, updateUser, logout} = useAuth()
   const {setLocale} = useLanguage()
   const {preferences, save, remove, find} = usePreferences()
-  const catalog = useCatalog()
+  const catalogSections = useCatalog()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
-  const [active, setActive] = useState<SectionKey>('profile')
-  const [detailOpen, setDetailOpen] = useState(false)
+  const [active, setActive] = useState<SectionKey | null>(null)
   const [picking, setPicking] = useState(false)
   const [editorItem, setEditorItem] = useState<ICatalogItem | null>(null)
+  const [nameDraft, setNameDraft] = useState('')
+  const [photoError, setPhotoError] = useState(false)
+
+  useEffect(() => {
+    if (user) setNameDraft(user.name)
+  }, [user?.name])
 
   function openEditor(item: ICatalogItem) {
     setEditorItem(item)
     setPicking(false)
+  }
+
+  function saveName() {
+    const next = nameDraft.trim()
+    if (next && next !== user?.name) void updateUser({name: next})
+  }
+
+  function handlePhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (file.size > 1_000_000) {
+      setPhotoError(true)
+      return
+    }
+    setPhotoError(false)
+    const reader = new FileReader()
+    reader.onload = () => void updateUser({photoUrl: String(reader.result)})
+    reader.readAsDataURL(file)
   }
 
   function saveQuickPick(options: IUserPreference['options'], isDefault: boolean) {
@@ -64,15 +96,11 @@ export function SettingsPage() {
   const notifValue = NOTIF_OPTIONS.find(o => o.value === user.notificationPref)
   const availValue = AVAILABILITY_OPTIONS.find(o => o.value === user.availability)
 
-  const sections: Array<{key: SectionKey; labelKey: string; icon: string; value?: string}> = [
+  type NavItem = {key: SectionKey; labelKey: string; icon: string; value?: string}
+  const sections: NavItem[] = [
     {key: 'profile', labelKey: 'settings.profile', icon: '👤'},
     {key: 'language', labelKey: 'settings.language', icon: '🌐', value: user.locale === 'bn' ? 'বাংলা' : 'English'},
-    {
-      key: 'notifications',
-      labelKey: 'settings.notifications',
-      icon: '🔔',
-      value: isStaff ? t('settings.notifAll') : notifValue ? t(notifValue.labelKey) : undefined,
-    },
+    // Staff: queue-focused — only Profile, Language, Availability. Members: prefs hub.
     ...(isStaff
       ? [
           {
@@ -80,17 +108,29 @@ export function SettingsPage() {
             labelKey: 'settings.availability',
             icon: '🟢',
             value: availValue ? t(availValue.labelKey) : undefined,
-          },
+          } as NavItem,
         ]
-      : []),
-    {key: 'quickPicks', labelKey: 'settings.quickPicks', icon: '⭐', value: String(preferences.length)},
-    {key: 'addOns', labelKey: 'settings.addOns', icon: '🧩', value: String(user.addOns.length)},
+      : [
+          {
+            key: 'notifications' as const,
+            labelKey: 'settings.notifications',
+            icon: '🔔',
+            value: notifValue ? t(notifValue.labelKey) : undefined,
+          } as NavItem,
+          {
+            key: 'quickPicks' as const,
+            labelKey: 'settings.quickPicks',
+            icon: '⭐',
+            value: String(preferences.length),
+          } as NavItem,
+          {
+            key: 'addOns' as const,
+            labelKey: 'settings.addOns',
+            icon: '🧩',
+            value: String(user.addOns.length),
+          } as NavItem,
+        ]),
   ]
-
-  function open(section: SectionKey) {
-    setActive(section)
-    setDetailOpen(true)
-  }
 
   async function handleEnablePush() {
     setPushStatus(await enablePush())
@@ -112,72 +152,111 @@ export function SettingsPage() {
     void updateUser({addOns: user!.addOns.filter(item => item !== value)})
   }
 
+  const nav = (
+    <nav className={styles.fdNav}>
+      <div className={styles.fdNavProfile}>
+        {user.photoUrl ? (
+          <img className={styles.fdNavAvatar} src={user.photoUrl} alt={user.name} />
+        ) : (
+          <span className={styles.fdNavAvatar}>{user.name.charAt(0).toUpperCase()}</span>
+        )}
+        <span className={styles.fdNavProfileText}>
+          <span className={styles.fdNavProfileName}>{user.name}</span>
+          <span className={styles.fdNavProfileMeta}>
+            {user.email} · {user.role}
+          </span>
+        </span>
+      </div>
+
+      {sections.map(section => (
+        <button
+          key={section.key}
+          type="button"
+          className={
+            section.key === active ? `${styles.fdNavItem} ${styles.fdNavItemOn}` : styles.fdNavItem
+          }
+          onClick={() => setActive(section.key)}
+        >
+          <span className={styles.fdNavIcon} aria-hidden="true">
+            {section.icon}
+          </span>
+          <span className={styles.fdNavLabel}>{t(section.labelKey)}</span>
+          {section.value && <span className={styles.fdNavValue}>{section.value}</span>}
+        </button>
+      ))}
+
+      <button
+        type="button"
+        className={`${styles.fdNavItem} ${styles.fdNavLogout}`}
+        onClick={() => void logout()}
+      >
+        <span className={styles.fdNavIcon} aria-hidden="true">
+          🚪
+        </span>
+        <span className={styles.fdNavLabel}>{t('home.logout')}</span>
+      </button>
+    </nav>
+  )
+
   return (
-    <div className={styles.fdSettings}>
+    <div className={styles.fdShell} data-selection={active !== null}>
       <AppHeader />
-      <div className={styles.fdShell} data-detail={detailOpen}>
-        <nav className={styles.fdNav}>
-          <h1 className={styles.fdNavTitle}>{t('settings.title')}</h1>
+      <div className={styles.fdBody}>
+        <aside className={styles.fdSidebar}>{nav}</aside>
+        <main className={styles.fdMain}>
+          {active === null ? (
+            <div className={styles.fdEmpty}>{t('settings.pickPrompt')}</div>
+          ) : (
+            <section className={styles.fdContent}>
+              <div className={styles.fdContentHead}>
+                <WuButton
+                  variant="iconOnly"
+                  className={styles.fdBack}
+                  Icon={<span aria-hidden="true">‹</span>}
+                  aria-label={t('groups.back')}
+                  onClick={() => setActive(null)}
+                />
+                <h2 className={styles.fdContentTitle}>
+                  {t(sections.find(s => s.key === active)?.labelKey ?? 'settings.title')}
+                </h2>
+              </div>
 
-          <div className={styles.fdNavProfile}>
-            <span className={styles.fdNavAvatar}>{user.name.charAt(0).toUpperCase()}</span>
-            <span className={styles.fdNavProfileText}>
-              <span className={styles.fdNavProfileName}>{user.name}</span>
-              <span className={styles.fdNavProfileMeta}>
-                {user.email} · {user.role}
-              </span>
-            </span>
-          </div>
-
-          {sections.map(section => (
-            <button
-              key={section.key}
-              type="button"
-              className={
-                section.key === active ? `${styles.fdNavItem} ${styles.fdNavItemOn}` : styles.fdNavItem
-              }
-              onClick={() => open(section.key)}
-            >
-              <span className={styles.fdNavIcon} aria-hidden="true">
-                {section.icon}
-              </span>
-              <span className={styles.fdNavLabel}>{t(section.labelKey)}</span>
-              {section.value && <span className={styles.fdNavValue}>{section.value}</span>}
-              <span className={styles.fdNavChevron} aria-hidden="true">
-                ›
-              </span>
-            </button>
-          ))}
-
-          <button
-            type="button"
-            className={`${styles.fdNavItem} ${styles.fdNavLogout}`}
-            onClick={() => void logout()}
-          >
-            <span className={styles.fdNavIcon} aria-hidden="true">
-              🚪
-            </span>
-            <span className={styles.fdNavLabel}>{t('home.logout')}</span>
-          </button>
-        </nav>
-
-        <section className={styles.fdContent}>
-          <button type="button" className={styles.fdBack} onClick={() => setDetailOpen(false)}>
-            ‹ {t('settings.title')}
-          </button>
-          <h2 className={styles.fdContentTitle}>
-            {t(sections.find(s => s.key === active)?.labelKey ?? 'settings.title')}
-          </h2>
-
-          {active === 'profile' && (
-            <div className={styles.fdProfile}>
-              <span className={styles.fdProfileAvatar}>{user.name.charAt(0).toUpperCase()}</span>
-              <div>
-                <div className={styles.fdProfileName}>{user.name}</div>
-                <div className={styles.fdProfileMeta}>{user.email}</div>
-                <div className={styles.fdProfileMeta}>
-                  {t('settings.role')}: {user.role}
+              {active === 'profile' && (
+            <div className={styles.fdProfileEdit}>
+              <div className={styles.fdProfile}>
+                {user.photoUrl ? (
+                  <img className={styles.fdProfileAvatar} src={user.photoUrl} alt={user.name} />
+                ) : (
+                  <span className={styles.fdProfileAvatar}>{user.name.charAt(0).toUpperCase()}</span>
+                )}
+                <div>
+                  <div className={styles.fdProfileMeta}>{user.email}</div>
+                  <div className={styles.fdProfileMeta}>
+                    {t('settings.role')}: {user.role}
+                  </div>
+                  <label className={styles.fdPhotoBtn}>
+                    {t('settings.changePhoto')}
+                    <input type="file" accept="image/*" hidden onChange={handlePhoto} />
+                  </label>
                 </div>
+              </div>
+              {photoError && <p className={styles.fdNote}>{t('settings.photoTooLarge')}</p>}
+              <label className={styles.fdEditorLabel}>{t('settings.editName')}</label>
+              <div className={styles.fdInline}>
+                <WuInput
+                  variant="outlined"
+                  type="text"
+                  value={nameDraft}
+                  onChange={event => setNameDraft(event.target.value)}
+                />
+                <WuButton
+                  variant="primary"
+                  size="sm"
+                  disabled={!nameDraft.trim() || nameDraft.trim() === user.name}
+                  onClick={saveName}
+                >
+                  {t('settings.save')}
+                </WuButton>
               </div>
             </div>
           )}
@@ -273,23 +352,25 @@ export function SettingsPage() {
                   ‹ {t('settings.quickPicks')}
                 </button>
                 <span className={styles.fdEditorLabel}>{t('settings.chooseItem')}</span>
-                <div className={styles.fdChips}>
-                  {catalog.map(item => (
-                    <button
-                      key={item.key}
-                      type="button"
-                      className={styles.fdChip}
-                      onClick={() => openEditor(item)}
-                    >
-                      {item.emoji} {t(item.labelKey)}
-                    </button>
-                  ))}
-                </div>
-                <div className={styles.fdEditorActions}>
-                  <WuButton variant="outline" size="sm" onClick={() => setPicking(false)}>
-                    {t('lunchoff.cancel')}
-                  </WuButton>
-                </div>
+                {catalogSections.map(section => (
+                  <div key={section.key} className={styles.fdPickerSection}>
+                    <span className={styles.fdQuickPickGroup}>
+                      {section.emoji} {t(section.labelKey)}
+                    </span>
+                    <div className={styles.fdChips}>
+                      {section.items.map(item => (
+                        <button
+                          key={item.key}
+                          type="button"
+                          className={styles.fdChip}
+                          onClick={() => openEditor(item)}
+                        >
+                          {item.emoji} {t(item.labelKey)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </>
             ) : (
               <>
@@ -297,46 +378,61 @@ export function SettingsPage() {
                 {preferences.length === 0 ? (
                   <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
                 ) : (
-                  <ul className={styles.fdQuickPicks}>
-                    {preferences.map(pref => {
-                      const item = catalog.find(c => c.key === pref.itemKey)
-                      return (
-                        <li key={pref.itemKey} className={styles.fdQuickPick}>
-                          <span className={styles.fdQuickPickEmoji} aria-hidden="true">
-                            {item?.emoji ?? '⭐'}
-                          </span>
-                          <span className={styles.fdQuickPickText}>
-                            <span className={styles.fdQuickPickName}>
-                              {t(`item.${pref.itemKey}`)}
-                              {pref.isDefault && (
-                                <span className={styles.fdQuickPickStar}>{t('settings.default')}</span>
-                              )}
-                            </span>
-                            <span className={styles.fdQuickPickSummary}>
-                              {preferenceSummary(pref.options)}
-                            </span>
-                          </span>
-                          {item && (
-                            <button
-                              type="button"
-                              className={styles.fdQuickPickEdit}
-                              onClick={() => openEditor(item)}
-                            >
-                              {t('settings.edit')}
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            className={styles.fdQuickPickRemove}
-                            aria-label={t('builder.remove')}
-                            onClick={() => void remove(pref.itemKey)}
-                          >
-                            ✕
-                          </button>
-                        </li>
-                      )
-                    })}
-                  </ul>
+                  catalogSections.map(section => {
+                    const picks = preferences.filter(pref =>
+                      section.items.some(item => item.key === pref.itemKey),
+                    )
+                    if (picks.length === 0) return null
+                    return (
+                      <div key={section.key} className={styles.fdPickerSection}>
+                        <span className={styles.fdQuickPickGroup}>
+                          {section.emoji} {t(section.labelKey)}
+                        </span>
+                        <ul className={styles.fdQuickPicks}>
+                          {picks.map(pref => {
+                            const item = section.items.find(i => i.key === pref.itemKey)
+                            return (
+                              <li key={pref.itemKey} className={styles.fdQuickPick}>
+                                <span className={styles.fdQuickPickEmoji} aria-hidden="true">
+                                  {item?.emoji ?? '⭐'}
+                                </span>
+                                <span className={styles.fdQuickPickText}>
+                                  <span className={styles.fdQuickPickName}>
+                                    {t(`item.${pref.itemKey}`)}
+                                    {pref.isDefault && (
+                                      <span className={styles.fdQuickPickStar}>
+                                        {t('settings.default')}
+                                      </span>
+                                    )}
+                                  </span>
+                                  <span className={styles.fdQuickPickSummary}>
+                                    {preferenceSummary(pref.options, item)}
+                                  </span>
+                                </span>
+                                {item && (
+                                  <button
+                                    type="button"
+                                    className={styles.fdQuickPickEdit}
+                                    onClick={() => openEditor(item)}
+                                  >
+                                    {t('settings.edit')}
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  className={styles.fdQuickPickRemove}
+                                  aria-label={t('builder.remove')}
+                                  onClick={() => void remove(pref.itemKey)}
+                                >
+                                  ✕
+                                </button>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                    )
+                  })
                 )}
                 <div className={styles.fdEditorActions}>
                   <WuButton variant="outline" size="sm" onClick={() => setPicking(true)}>
@@ -373,7 +469,9 @@ export function SettingsPage() {
               </div>
             </>
           )}
-        </section>
+            </section>
+          )}
+        </main>
       </div>
     </div>
   )

@@ -26,6 +26,13 @@ export interface ICatalogCategory {
 }
 export type ICatalog = ICatalogCategory[]
 
+export interface ICatalogSection {
+  key: string
+  labelKey: string
+  emoji?: string
+  items: ICatalogItem[]
+}
+
 const sugarModifier: ICatalogModifier = {
   key: 'sugar',
   labelKey: 'mod.sugar',
@@ -47,6 +54,22 @@ const mixModifier: ICatalogModifier = {
     {key: 'both', labelKey: 'mix.both'},
   ],
 }
+const milkModifier: ICatalogModifier = {
+  key: 'milk',
+  labelKey: 'mod.milk',
+  options: [
+    {key: 'withMilk', labelKey: 'milk.with', emoji: '🥛'},
+    {key: 'withoutMilk', labelKey: 'milk.without'},
+  ],
+}
+const coffeeStyleModifier: ICatalogModifier = {
+  key: 'coffeeStyle',
+  labelKey: 'mod.coffeeStyle',
+  options: [
+    {key: 'black', labelKey: 'coffee.black'},
+    {key: 'white', labelKey: 'coffee.white', emoji: '🥛'},
+  ],
+}
 
 export const REQUESTS_CATALOG: ICatalog = [
   {
@@ -55,8 +78,20 @@ export const REQUESTS_CATALOG: ICatalog = [
     emoji: '🥤',
     items: [
       {key: 'water', labelKey: 'item.water', emoji: '💧', quantity: true},
-      {key: 'tea', labelKey: 'item.tea', emoji: '☕', quantity: true, modifiers: [sugarModifier, mixModifier]},
-      {key: 'coffee', labelKey: 'item.coffee', emoji: '☕', quantity: true, modifiers: [sugarModifier]},
+      {
+        key: 'tea',
+        labelKey: 'item.tea',
+        emoji: '☕',
+        quantity: true,
+        modifiers: [milkModifier, sugarModifier, mixModifier],
+      },
+      {
+        key: 'coffee',
+        labelKey: 'item.coffee',
+        emoji: '☕',
+        quantity: true,
+        modifiers: [coffeeStyleModifier, sugarModifier],
+      },
       {key: 'juice', labelKey: 'item.juice', emoji: '🧃', quantity: true},
       {key: 'cold', labelKey: 'item.cold', emoji: '🥤', quantity: true},
     ],

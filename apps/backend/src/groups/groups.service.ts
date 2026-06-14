@@ -3,6 +3,7 @@ import {
   GROUP_CONFIGS,
   SEEDED_GROUP_KEYS,
   type ICatalogItem,
+  type ICatalogSection,
   type IGroupConfig,
   type IGroupSummary,
 } from '@frontdesk/types'
@@ -65,5 +66,24 @@ export class GroupsService {
       }
     }
     return items
+  }
+
+  catalogSections(): ICatalogSection[] {
+    const sections = new Map<string, ICatalogSection>()
+    for (const key of SEEDED_GROUP_KEYS) {
+      for (const category of GROUP_CONFIGS[key]?.catalog ?? []) {
+        if (category.freeText || !category.items?.length) continue
+        const existing = sections.get(category.key)
+        const section =
+          existing ??
+          ({key: category.key, labelKey: category.labelKey, emoji: category.emoji, items: []} as ICatalogSection)
+        const seen = new Set(section.items.map(item => item.key))
+        for (const item of category.items) {
+          if (!seen.has(item.key)) section.items.push(item)
+        }
+        sections.set(category.key, section)
+      }
+    }
+    return [...sections.values()]
   }
 }

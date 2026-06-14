@@ -1,0 +1,595 @@
+/* Panel = soft gray; cards = white + shadow (matches proto design language).
+   App tokens are bg=#fff / surface=#f5f5f5, so a card needs white-on-gray. */
+.fdMember {
+  --panel: color-mix(in srgb, var(--fd-surface), var(--fd-text) 5%);
+  --card-radius: calc(var(--fd-radius) * 1.5);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.07);
+  --card-shadow-hover: 0 0.375rem 1rem rgb(0 0 0 / 0.1);
+  --hair: color-mix(in srgb, var(--fd-text), transparent 86%);
+  --ink: color-mix(in srgb, var(--fd-text), black 30%);
+  --muted: color-mix(in srgb, var(--fd-text), var(--fd-bg) 25%);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+/* wm-* icons are an icon font — tie their glyph size to the element font. */
+.fdMember [class*='wm-'] {
+  font-size: var(--fd-font); /* 14px */
+  line-height: 1;
+}
+
+/* Quick picks aside: top on mobile (height-capped), right column on desktop. */
+.fdSide {
+  order: -1;
+  flex-shrink: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: calc(var(--fd-space) * 1.75);
+  border-bottom: 1px solid var(--hair);
+}
+
+/* Left column: orders scroll above, compose bar pinned at the bottom.
+   min-width:0 lets a wide table scroll instead of stretching the layout. */
+.fdMain {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 48rem) {
+  .fdMember {
+    flex-direction: row;
+  }
+
+  .fdSide {
+    order: 2;
+    width: 18rem;
+    max-height: none;
+    overflow-y: auto;
+    border-bottom: none;
+    border-left: 1px solid var(--hair);
+  }
+}
+
+.fdSectionTitle {
+  margin: 0 0 calc(var(--fd-space) * 1.25);
+  font-size: calc(var(--fd-font) * 0.8);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Quick picks: compact one-tap list rows (matches proto). ------------- */
+.fdQuickRow {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.75);
+}
+
+.fdQuickCard {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  width: 100%;
+  padding: calc(var(--fd-space) * 0.85) var(--fd-space);
+  border: none;
+  border-radius: var(--card-radius);
+  background: var(--fd-bg);
+  box-shadow: var(--card-shadow);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.12s ease;
+
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &[data-picked='true'] {
+    box-shadow: 0 0 0 0.125rem var(--fd-primary);
+  }
+}
+
+.fdQuickEmoji {
+  flex-shrink: 0;
+  font-size: calc(var(--fd-font) * 1.4);
+  line-height: 1;
+}
+
+.fdPickTick {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1.5px solid var(--hair);
+  border-radius: 50%;
+  font-size: calc(var(--fd-font) * 0.8);
+  font-weight: 700;
+  color: var(--fd-bg);
+
+  &[data-on='true'] {
+    border-color: var(--fd-primary);
+    background: var(--fd-primary);
+  }
+}
+
+.fdPickBar {
+  margin-top: var(--fd-space);
+}
+
+.fdPickSend {
+  width: 100%;
+}
+
+.fdQuickMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.fdQuickName {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.4);
+  font-weight: 700;
+  font-size: calc(var(--fd-font) * 0.92);
+  color: var(--ink);
+}
+
+.fdQuickSub {
+  display: block;
+  font-size: calc(var(--fd-font) * 0.78);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdQuickStar {
+  color: #e0a92e;
+  font-size: calc(var(--fd-font) * 0.82);
+}
+
+.fdQuickEmpty {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  width: 100%;
+  padding: var(--fd-space);
+  border: 1px dashed color-mix(in srgb, var(--fd-primary), transparent 55%);
+  border-radius: var(--card-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 95%);
+  color: var(--fd-primary);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 90%);
+  }
+}
+
+.fdQuickEmptyIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--fd-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  font-size: calc(var(--fd-font) * 1.25);
+  font-weight: 700;
+}
+
+/* Orders: head + toolbar fixed, only the list scrolls ----------------- */
+.fdOrdersSection {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--fd-space) * 1.75);
+}
+
+/* Filters + bulk toolbar -------------------------------------------- */
+.fdOrdersHead {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: calc(var(--fd-space) * 1.25);
+}
+
+.fdOrdersHead .fdSectionTitle {
+  margin: 0;
+}
+
+.fdHeadRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+}
+
+/* Space between the quick-picks header (with Select multiple) and the cards. */
+.fdQuickSection .fdHeadRow {
+  margin-bottom: calc(var(--fd-space) * 1.5);
+}
+
+.fdHeadActions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+}
+
+/* Uniform height across every action WuButton (text + icon-only).
+   Scoped under .fdMember to outrank wick-ui's own button sizing. */
+.fdMember .fdBtn {
+  height: 2rem;
+  min-height: 2rem;
+  padding-block: 0;
+}
+
+/* Icon-only buttons stay square at that height. */
+.fdMember .fdIconBtn {
+  width: 2rem;
+  min-width: 2rem;
+  padding-inline: 0;
+}
+
+/* wick-ui drops the outline border (1px -> 0) on hover, shifting content.
+   Keep it 1px so the button doesn't jump. */
+.fdMember .fdBtn[data-variant='outline']:hover:not(:disabled) {
+  border-width: 1px;
+}
+
+/* Collapsible filter panel: animate via grid-rows 0fr -> 1fr (smooth, no
+   fixed max-height). The inner wrapper clips while collapsed. */
+.fdFilterPanel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.24s ease, opacity 0.24s ease;
+
+  &[data-open='true'] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+.fdFilterInner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.75);
+  padding-top: calc(var(--fd-space) * 0.75);
+}
+
+.fdFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+}
+
+.fdDateInput {
+  padding: calc(var(--fd-space) * 0.35) calc(var(--fd-space) * 0.75);
+  border: 1px solid var(--hair);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-bg);
+  color: var(--muted);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.8);
+  cursor: pointer;
+}
+
+.fdDateInputOn {
+  border-color: var(--fd-primary);
+  color: var(--fd-primary);
+}
+
+.fdChip {
+  padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 1);
+  border: 1px solid var(--hair);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: var(--fd-bg);
+  color: var(--muted);
+  font-size: calc(var(--fd-font) * 0.8);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+
+  &:hover {
+    border-color: var(--fd-primary);
+    color: var(--fd-primary);
+  }
+}
+
+.fdChipOn {
+  border-color: var(--fd-primary);
+  background: var(--fd-primary);
+  color: var(--fd-bg);
+
+  &:hover {
+    color: var(--fd-bg);
+  }
+}
+
+.fdToolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+  margin-bottom: calc(var(--fd-space) * 1.25);
+  padding: calc(var(--fd-space) * 0.75) calc(var(--fd-space) * 1.25);
+  border: 1px solid var(--hair);
+  border-radius: var(--card-radius);
+  background: var(--fd-bg);
+  box-shadow: var(--card-shadow);
+  min-height: 2.75rem;
+  transition: background 0.12s ease, border-color 0.12s ease;
+
+  &[data-active='true'] {
+    border-color: color-mix(in srgb, var(--fd-primary), transparent 55%);
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 92%);
+  }
+}
+
+.fdToolbarActions {
+  display: flex;
+  gap: calc(var(--fd-space) * 0.5);
+}
+
+.fdToolbarCount {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Only the table body scrolls; head + filters + bulk bar stay fixed.
+   min-width:0 + overflow:auto = wide columns scroll, never break layout. */
+.fdTableWrap {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Danger variant of the text button (bulk delete). */
+.fdBulkDanger {
+  border-color: color-mix(in srgb, var(--fd-error), transparent 55%);
+  color: var(--fd-error);
+
+  &:hover {
+    border-color: var(--fd-error);
+    color: var(--fd-error);
+    background: color-mix(in srgb, var(--fd-error), var(--fd-bg) 92%);
+  }
+}
+
+/* Order rows --------------------------------------------------------- */
+.fdOrders {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 1.25);
+}
+
+.fdOrder {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 1.25) calc(var(--fd-space) * 1.5);
+  border-radius: var(--card-radius);
+  background: var(--fd-bg);
+  box-shadow: var(--card-shadow);
+  transition: opacity 0.15s ease, box-shadow 0.12s ease;
+
+  &[data-busy='true'] {
+    opacity: 0.45;
+  }
+
+  &[data-selected='true'] {
+    box-shadow: 0 0 0 0.125rem var(--fd-primary);
+  }
+}
+
+.fdOrderActions {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
+  flex-shrink: 0;
+}
+
+.fdOrderSummary {
+  flex: 1;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.fdOrderMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+}
+
+.fdOrderTime {
+  font-size: calc(var(--fd-font) * 0.79);
+  color: var(--muted);
+}
+
+.fdStatusChip {
+  padding: calc(var(--fd-space) * 0.4) calc(var(--fd-space) * 0.9);
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  font-size: calc(var(--fd-font) * 0.76);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &[data-status='pending'] {
+    background: color-mix(in srgb, #b45309, var(--fd-bg) 86%);
+    color: #b45309;
+  }
+
+  &[data-status='in_progress'] {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 86%);
+    color: var(--fd-primary);
+  }
+
+  &[data-status='done'] {
+    background: color-mix(in srgb, #15803d, var(--fd-bg) 86%);
+    color: #15803d;
+  }
+
+  &[data-status='cancelled'] {
+    background: color-mix(in srgb, var(--fd-error), var(--fd-bg) 86%);
+    color: var(--fd-error);
+  }
+}
+
+.fdState,
+.fdEmpty {
+  margin: 0;
+  padding: calc(var(--fd-space) * 4) calc(var(--fd-space) * 2);
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Compose bar (pinned bottom of the left column) ----------------------- */
+.fdComposeBar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 1.75);
+  border-top: 1px solid var(--hair);
+  background: var(--fd-bg);
+}
+
+.fdBuildBtn {
+  align-self: flex-start;
+}
+
+.fdOpenForm {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+
+  & > :first-child {
+    flex: 1;
+  }
+}
+
+.fdSendBtn {
+  flex-shrink: 0;
+}
+
+/* Undo snackbars ------------------------------------------------------- */
+.fdSnacks {
+  position: absolute;
+  top: calc(var(--fd-space) * 1.75);
+  right: calc(var(--fd-space) * 1.75);
+  width: min(24rem, calc(100% - var(--fd-space) * 3));
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.75);
+  z-index: 20;
+}
+
+.fdSnack {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 1.25) calc(var(--fd-space) * 1.5);
+  border-radius: var(--card-radius);
+  background: color-mix(in srgb, var(--fd-text), black 45%);
+  color: var(--fd-bg);
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.25);
+  overflow: hidden;
+  animation: fdSnackIn 0.18s ease;
+
+  &[data-kind='cancel'] {
+    background: color-mix(in srgb, var(--fd-error), black 12%);
+  }
+}
+
+.fdSnackText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.2);
+  min-width: 0;
+
+  & b {
+    font-size: calc(var(--fd-font) * 0.9);
+  }
+}
+
+.fdSnackLabel {
+  font-size: calc(var(--fd-font) * 0.79);
+  opacity: 0.78;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fdUndo {
+  flex-shrink: 0;
+  padding: calc(var(--fd-space) * 0.5) calc(var(--fd-space) * 1.1);
+  border: none;
+  border-radius: var(--fd-radius-pill, 624.9375rem);
+  background: color-mix(in srgb, var(--fd-bg), transparent 82%);
+  color: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-bg), transparent 70%);
+  }
+}
+
+.fdSnackBar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 0.1875rem;
+  width: 100%;
+  background: color-mix(in srgb, var(--fd-bg), transparent 50%);
+  transform-origin: left;
+  animation: fdSnackCountdown 5s linear forwards;
+}
+
+@keyframes fdSnackIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes fdSnackCountdown {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}

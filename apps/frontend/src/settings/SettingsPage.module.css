@@ -1,15 +1,65 @@
-.fdSettings {
+.fdShell {
   display: flex;
   height: 100%;
   flex-direction: column;
-  min-height: 0;
   background: var(--fd-surface);
 }
 
-.fdShell {
+.fdBody {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+}
+
+.fdSidebar {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--fd-bg);
+}
+
+.fdMain {
+  display: none;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.fdEmpty {
   display: flex;
   flex: 1;
-  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--fd-space) * 2);
+  color: color-mix(in srgb, var(--fd-text), transparent 40%);
+  font-size: calc(var(--fd-font) * 0.93);
+}
+
+/* Mobile: one pane at a time. */
+.fdShell[data-selection='true'] .fdSidebar {
+  display: none;
+}
+
+.fdShell[data-selection='true'] .fdMain {
+  display: flex;
+}
+
+/* Tablet and up: two-pane layout, both always visible. */
+@media (min-width: 48rem) {
+  .fdSidebar {
+    width: 17rem;
+    border-right: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+  }
+
+  .fdMain {
+    display: flex;
+  }
+
+  .fdShell[data-selection='true'] .fdSidebar {
+    display: flex;
+  }
 }
 
 .fdNav {
@@ -17,15 +67,7 @@
   width: 100%;
   flex-direction: column;
   gap: calc(var(--fd-space) * 0.25);
-  padding: calc(var(--fd-space) * 1.5);
-  background: var(--fd-bg);
-}
-
-.fdNavTitle {
-  margin: 0 0 var(--fd-space);
-  padding: 0 calc(var(--fd-space) * 0.75);
-  font-size: calc(var(--fd-font) * 1.35);
-  font-weight: 700;
+  padding: calc(var(--fd-space) * 0.75);
 }
 
 .fdNavProfile {
@@ -48,6 +90,7 @@
   color: #fff;
   font-size: var(--fd-font);
   font-weight: 700;
+  object-fit: cover;
 }
 
 .fdNavProfileText {
@@ -99,12 +142,14 @@
 }
 
 .fdNavValue {
+  overflow: hidden;
+  max-width: 7rem;
+  flex-shrink: 0;
   color: color-mix(in srgb, var(--fd-text), transparent 40%);
   font-size: calc(var(--fd-font) * 0.86);
-}
-
-.fdNavChevron {
-  color: color-mix(in srgb, var(--fd-text), transparent 50%);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fdNavItemOn {
@@ -118,62 +163,38 @@
   color: var(--fd-error);
 }
 
-@media (min-width: 48rem) {
-  .fdNavChevron {
-    display: none;
-  }
-}
-
 .fdContent {
-  display: none;
+  display: flex;
   flex: 1;
   flex-direction: column;
   overflow-y: auto;
   padding: calc(var(--fd-space) * 2.5);
 }
 
+.fdContentHead {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  margin-bottom: calc(var(--fd-space) * 1.5);
+}
+
 .fdBack {
-  align-self: flex-start;
-  margin-bottom: var(--fd-space);
+  width: calc(var(--fd-space) * 3.5);
+  height: calc(var(--fd-space) * 3.5);
   padding: 0;
   border: 0;
-  background: none;
-  color: var(--fd-primary);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
+  border-radius: 50%;
+  font-size: calc(var(--fd-font) * 1.5);
+  line-height: 1;
 }
 
 .fdContentTitle {
-  margin: 0 0 calc(var(--fd-space) * 1.5);
+  margin: 0;
   font-size: calc(var(--fd-font) * 1.25);
   font-weight: 700;
 }
 
-/* Mobile: one pane — nav, or detail when a section is opened. */
-.fdShell[data-detail='true'] .fdNav {
-  display: none;
-}
-
-.fdShell[data-detail='true'] .fdContent {
-  display: flex;
-}
-
 @media (min-width: 48rem) {
-  .fdNav {
-    width: 16rem;
-    flex-shrink: 0;
-    border-right: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 35%);
-  }
-
-  .fdContent {
-    display: flex;
-  }
-
-  .fdShell[data-detail='true'] .fdNav {
-    display: flex;
-  }
-
   .fdBack {
     display: none;
   }
@@ -185,10 +206,17 @@
   gap: var(--fd-space);
 }
 
+.fdProfileEdit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fd-space);
+}
+
 .fdProfileAvatar {
   display: flex;
   width: calc(var(--fd-space) * 6);
   height: calc(var(--fd-space) * 6);
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
@@ -196,6 +224,16 @@
   color: #fff;
   font-size: calc(var(--fd-font) * 1.5);
   font-weight: 700;
+  object-fit: cover;
+}
+
+.fdPhotoBtn {
+  display: inline-block;
+  margin-top: calc(var(--fd-space) * 0.5);
+  color: var(--fd-primary);
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .fdProfileName {
@@ -278,11 +316,23 @@
   }
 }
 
+.fdPickerSection {
+  margin-bottom: calc(var(--fd-space) * 1.5);
+}
+
+.fdQuickPickGroup {
+  display: block;
+  margin-bottom: calc(var(--fd-space) * 0.75);
+  color: color-mix(in srgb, var(--fd-text), transparent 20%);
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 700;
+}
+
 .fdQuickPicks {
   display: flex;
   flex-direction: column;
   gap: calc(var(--fd-space) * 0.75);
-  margin: 0 0 calc(var(--fd-space) * 1.5);
+  margin: 0;
   padding: 0;
   list-style: none;
 }

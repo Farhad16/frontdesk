@@ -1,0 +1,159 @@
+/* Quick pick strip — shared cards from the Requests member view. Mobile: a
+   horizontal scroll row pinned above the thread. Desktop: a vertical stack in
+   the right column. */
+.fdQuickSection {
+  padding: calc(var(--fd-space) * 1.75);
+}
+
+.fdSectionTitle {
+  margin: 0 0 calc(var(--fd-space) * 1.25);
+  font-size: calc(var(--fd-font) * 0.8);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.fdQuickRow {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--fd-space) * 1.25);
+  overflow-x: auto;
+  padding-bottom: calc(var(--fd-space) * 0.5);
+}
+
+.fdQuickRow > .fdQuickCard {
+  flex: 0 0 11rem;
+}
+
+.fdQuickCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 1.25);
+  padding: calc(var(--fd-space) * 1.25);
+  border: none;
+  border-radius: var(--card-radius);
+  background: var(--fd-bg);
+  box-shadow: var(--card-shadow);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+
+  &:hover {
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.fdQuickEmoji {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--fd-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 90%);
+  font-size: calc(var(--fd-font) * 1.5);
+}
+
+.fdQuickMeta {
+  flex: 1;
+  min-width: 0;
+}
+
+.fdQuickName {
+  display: block;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.fdQuickSub {
+  display: block;
+  margin-top: calc(var(--fd-space) * 0.25);
+  font-size: calc(var(--fd-font) * 0.82);
+  color: var(--muted);
+}
+
+.fdQuickStar {
+  position: absolute;
+  top: calc(var(--fd-space) * 0.75);
+  right: calc(var(--fd-space) * 1);
+  color: #e0a92e;
+  font-size: calc(var(--fd-font) * 0.9);
+}
+
+.fdQuickEmpty {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  width: 100%;
+  padding: calc(var(--fd-space) * 1.75);
+  border: 1px dashed color-mix(in srgb, var(--fd-primary), transparent 55%);
+  border-radius: var(--card-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 95%);
+  color: var(--fd-primary);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 90%);
+  }
+}
+
+.fdQuickEmptyIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--fd-radius);
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+  font-size: calc(var(--fd-font) * 1.4);
+  font-weight: 700;
+}
+
+/* Desktop right column: stack cards vertically, compact rows. */
+@media (min-width: 48rem) {
+  .fdQuickRow {
+    flex-direction: column;
+    align-items: stretch;
+    overflow-x: visible;
+    gap: calc(var(--fd-space) * 0.75);
+  }
+
+  .fdQuickRow > .fdQuickCard {
+    flex: initial;
+  }
+
+  .fdQuickCard {
+    padding: calc(var(--fd-space) * 0.5) calc(var(--fd-space) * 0.75);
+    gap: calc(var(--fd-space) * 0.75);
+  }
+
+  .fdQuickEmoji {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: calc(var(--fd-radius) * 0.75);
+    font-size: calc(var(--fd-font) * 1.05);
+  }
+
+  .fdQuickName {
+    font-size: calc(var(--fd-font) * 0.9);
+  }
+
+  .fdQuickSub {
+    margin-top: 0;
+    font-size: calc(var(--fd-font) * 0.75);
+  }
+
+  .fdQuickStar {
+    top: calc(var(--fd-space) * 0.4);
+    right: calc(var(--fd-space) * 0.6);
+  }
+}

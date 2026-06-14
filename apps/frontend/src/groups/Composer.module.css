@@ -1,8 +1,15 @@
 .quickRow {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: calc(var(--fd-space) * 0.75);
   padding: calc(var(--fd-space) * 1.25) calc(var(--fd-space) * 1.5) 0;
+}
+
+.sent {
+  color: #15803d;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
 }
 
 .quickBtn {

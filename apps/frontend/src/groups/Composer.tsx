@@ -7,7 +7,7 @@ import {useCompose} from './useCompose'
 import {useGroupConfig} from './useGroupConfig'
 import styles from './Composer.module.css'
 
-export function Composer({groupKey}: {groupKey: string}) {
+export function Composer({groupKey, actionsOnly = false}: {groupKey: string; actionsOnly?: boolean}) {
   const {user} = useAuth()
   const config = useGroupConfig(groupKey)
   const {sending, sendText, sendQuick, sendRequest, sendLunchOff} = useCompose(groupKey)
@@ -16,6 +16,7 @@ export function Composer({groupKey}: {groupKey: string}) {
   const [dateOpen, setDateOpen] = useState(false)
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
+  const [sentAt, setSentAt] = useState(0)
 
   const roleVisible = (visibleToRole?: string) => !visibleToRole || visibleToRole === user?.role
   const hasCatalog = Boolean(config?.catalog && config.catalog.length > 0)
@@ -26,12 +27,23 @@ export function Composer({groupKey}: {groupKey: string}) {
     action => action.opensDatePicker && roleVisible(action.visibleToRole),
   )
 
+  function flashSent() {
+    setSentAt(Date.now())
+    setTimeout(() => setSentAt(at => (Date.now() - at >= 1900 ? 0 : at)), 2000)
+  }
+
+  async function postQuick(key: string) {
+    await sendQuick(key)
+    flashSent()
+  }
+
   async function postLunchOff() {
     if (!from) return
     await sendLunchOff(from, to || from)
     setDateOpen(false)
     setFrom('')
     setTo('')
+    flashSent()
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -56,7 +68,7 @@ export function Composer({groupKey}: {groupKey: string}) {
               type="button"
               className={styles.quickBtn}
               disabled={sending}
-              onClick={() => void sendQuick(action.key)}
+              onClick={() => void postQuick(action.key)}
             >
               {t(`quick.${action.key}`)}
             </button>
@@ -70,6 +82,7 @@ export function Composer({groupKey}: {groupKey: string}) {
               {t(`quick.${dateAction.key}`)}
             </button>
           )}
+          {sentAt > 0 && <span className={styles.sent}>{t('thread.sent')}</span>}
         </div>
       )}
 
@@ -89,28 +102,30 @@ export function Composer({groupKey}: {groupKey: string}) {
         </div>
       )}
 
-      <form className={styles.composer} onSubmit={handleSubmit}>
-        {hasCatalog && (
-          <WuButton
-            type="button"
-            variant="iconOnly"
-            className={styles.composerAdd}
-            Icon={<span aria-hidden="true">＋</span>}
-            aria-label={t('builder.newRequest')}
-            onClick={() => setBuilderOpen(true)}
+      {!actionsOnly && (
+        <form className={styles.composer} onSubmit={handleSubmit}>
+          {hasCatalog && (
+            <WuButton
+              type="button"
+              variant="iconOnly"
+              className={styles.composerAdd}
+              Icon={<span aria-hidden="true">＋</span>}
+              aria-label={t('builder.newRequest')}
+              onClick={() => setBuilderOpen(true)}
+            />
+          )}
+          <WuInput
+            variant="outlined"
+            type="text"
+            placeholder={t('thread.inputPlaceholder')}
+            value={draft}
+            onChange={event => setDraft(event.target.value)}
           />
-        )}
-        <WuInput
-          variant="outlined"
-          type="text"
-          placeholder={t('thread.inputPlaceholder')}
-          value={draft}
-          onChange={event => setDraft(event.target.value)}
-        />
-        <WuButton type="submit" variant="primary" loading={sending} disabled={!draft.trim()}>
-          {t('thread.send')}
-        </WuButton>
-      </form>
+          <WuButton type="submit" variant="primary" loading={sending} disabled={!draft.trim()}>
+            {t('thread.send')}
+          </WuButton>
+        </form>
+      )}
 
       {builderOpen && config && (
         <RequestBuilder
