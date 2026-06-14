@@ -134,6 +134,50 @@
   }
 }
 
+.fdQuickPicks {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fdQuickPick {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
+  border-radius: var(--fd-radius);
+  background: var(--fd-surface);
+
+  button {
+    flex-shrink: 0;
+    border: 0;
+    background: none;
+    color: color-mix(in srgb, var(--fd-text), transparent 30%);
+    cursor: pointer;
+  }
+}
+
+.fdQuickPickText {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.15);
+  min-width: 0;
+}
+
+.fdQuickPickName {
+  font-size: var(--fd-font);
+  font-weight: 600;
+}
+
+.fdQuickPickSummary {
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: calc(var(--fd-font) * 0.86);
+}
+
 .fdInline {
   display: flex;
   gap: var(--fd-space);

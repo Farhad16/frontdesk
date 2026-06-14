@@ -21,10 +21,15 @@ export function usePreferences() {
     setPreferences(prev => [...prev.filter(p => p.itemKey !== itemKey), saved])
   }, [])
 
+  const remove = useCallback(async (itemKey: string) => {
+    await apiClient.delete(`/preferences/${itemKey}`)
+    setPreferences(prev => prev.filter(p => p.itemKey !== itemKey))
+  }, [])
+
   const find = useCallback(
     (itemKey: string) => preferences.find(p => p.itemKey === itemKey),
     [preferences],
   )
 
-  return {preferences, save, find}
+  return {preferences, save, find, remove}
 }

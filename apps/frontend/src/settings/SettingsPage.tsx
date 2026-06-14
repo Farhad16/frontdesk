@@ -3,10 +3,20 @@ import {WuButton, WuInput} from '@npm-questionpro/wick-ui-lib'
 import {useState} from 'react'
 import {useAuth} from '../auth/AuthContext'
 import {AppHeader} from '../components/AppHeader'
+import {usePreferences} from '../groups/usePreferences'
 import {t, type Locale} from '../i18n'
 import {useLanguage} from '../i18n/LanguageContext'
 import {enablePush, getPushStatus, type PushStatus} from '../lib/push'
 import styles from './SettingsPage.module.css'
+
+function preferenceSummary(options: Record<string, string | string[]>): string {
+  const parts: string[] = []
+  Object.entries(options).forEach(([key, value]) => {
+    if (key === 'addOns' && Array.isArray(value)) parts.push(...value)
+    else if (typeof value === 'string') parts.push(t(`${key}.${value}`))
+  })
+  return parts.join(', ')
+}
 
 const NOTIF_OPTIONS: Array<{value: NotificationPref; labelKey: string}> = [
   {value: 'ALL', labelKey: 'settings.notifAll'},
@@ -24,6 +34,7 @@ const AVAILABILITY_OPTIONS: Array<{value: Availability; labelKey: string}> = [
 export function SettingsPage() {
   const {user, updateUser} = useAuth()
   const {setLocale} = useLanguage()
+  const {preferences, remove} = usePreferences()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
 
@@ -143,6 +154,34 @@ export function SettingsPage() {
             </div>
           </section>
         )}
+
+        <section className={styles.fdCard}>
+          <h2 className={styles.fdCardTitle}>{t('settings.quickPicks')}</h2>
+          <p className={styles.fdNote}>{t('settings.quickPicksHint')}</p>
+          {preferences.length === 0 ? (
+            <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
+          ) : (
+            <ul className={styles.fdQuickPicks}>
+              {preferences.map(pref => (
+                <li key={pref.itemKey} className={styles.fdQuickPick}>
+                  <span className={styles.fdQuickPickText}>
+                    <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
+                    <span className={styles.fdQuickPickSummary}>
+                      {preferenceSummary(pref.options)}
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    aria-label={t('builder.remove')}
+                    onClick={() => void remove(pref.itemKey)}
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <section className={styles.fdCard}>
           <h2 className={styles.fdCardTitle}>{t('settings.addOns')}</h2>

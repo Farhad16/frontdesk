@@ -167,4 +167,7 @@ export const bn: Partial<Record<string, string>> = {
   'settings.availabilityAway': 'অনুপস্থিত',
   'settings.saved': 'সংরক্ষিত',
   'settings.back': 'ফিরে যান',
+  'settings.quickPicks': 'কুইক পিক',
+  'settings.quickPicksHint': 'সংরক্ষিত আইটেম ডিফল্ট — অর্ডার বিল্ডার থেকে সেট করুন, এখানে পরিচালনা করুন।',
+  'settings.quickPicksEmpty': 'এখনো কোনো কুইক পিক নেই। অর্ডার বিল্ডার থেকে সংরক্ষণ করুন।',
 }
