@@ -1,6 +1,6 @@
 import type {IGroupLastMessage} from '@frontdesk/types'
-import {WuInput, WuLoader} from '@npm-questionpro/wick-ui-lib'
-import {useEffect, useReducer, useState} from 'react'
+import {WuLoader} from '@npm-questionpro/wick-ui-lib'
+import {useEffect, useReducer} from 'react'
 import {NavLink} from 'react-router-dom'
 import {t} from '../i18n'
 import {getGroupReadAt, subscribeReads} from '../lib/reads'
@@ -20,27 +20,14 @@ function previewText(last: IGroupLastMessage): string {
 
 export function GroupList() {
   const {groups, loading, error} = useGroups()
-  const [query, setQuery] = useState('')
   const [, bump] = useReducer((n: number) => n + 1, 0)
 
   useEffect(() => subscribeReads(bump), [])
 
-  const visible = groups.filter(group =>
-    t(group.nameKey).toLowerCase().includes(query.trim().toLowerCase()),
-  )
+  const visible = groups
 
   return (
     <div className={styles.fdGroupList}>
-      <div className={styles.fdGroupSearch}>
-        <WuInput
-          variant="outlined"
-          type="search"
-          placeholder={t('groups.searchPlaceholder')}
-          value={query}
-          onChange={event => setQuery(event.target.value)}
-        />
-      </div>
-
       {loading && (
         <div className={styles.fdGroupState}>
           <WuLoader size="sm" variant="spinner" />
@@ -62,6 +49,7 @@ export function GroupList() {
             <NavLink
               key={group.key}
               to={`/groups/${group.key}`}
+              title={t(group.nameKey)}
               className={({isActive}) =>
                 isActive ? `${styles.fdGroupItem} ${styles.fdGroupItemActive}` : styles.fdGroupItem
               }

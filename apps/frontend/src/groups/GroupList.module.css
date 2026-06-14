@@ -1,6 +1,6 @@
 .fdGroupList {
   display: flex;
-  height: 100%;
+  flex: 1;
   flex-direction: column;
   min-height: 0;
 }
@@ -23,8 +23,23 @@
 
 .fdGroupItems {
   display: flex;
+  flex: 1;
   flex-direction: column;
   overflow-y: auto;
+}
+
+/* Collapsed sidebar (desktop): show only group emoji icons. The ancestor
+   [data-collapsed='true'] attribute lives on the sidebar <aside>. */
+@media (min-width: 48rem) {
+  [data-collapsed='true'] .fdGroupSearch,
+  [data-collapsed='true'] .fdGroupText {
+    display: none;
+  }
+
+  [data-collapsed='true'] .fdGroupItem {
+    justify-content: center;
+    padding: calc(var(--fd-space) * 1.25) 0;
+  }
 }
 
 .fdGroupItem {
@@ -44,10 +59,10 @@
 }
 
 .fdGroupItemActive {
-  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 92%);
+  background: rgb(27 135 230 / 0.08); /* match WuDataTable selected-row bg (wu-blue-p @ 8%) */
 
   &:hover {
-    background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 88%);
+    background: rgb(27 135 230 / 0.16);
   }
 }
 

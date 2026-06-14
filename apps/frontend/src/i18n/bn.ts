@@ -34,6 +34,7 @@ export const bn: Partial<Record<string, string>> = {
 
   'groups.title': 'গ্রুপ',
   'groups.searchPlaceholder': 'গ্রুপ খুঁজুন',
+  'groups.toggleSidebar': 'সাইডবার টগল',
   'groups.noResults': 'আপনার খোঁজার সাথে কোনো গ্রুপ মেলেনি।',
   'groups.noMessages': 'এখনো কোনো বার্তা নেই',
   'groups.pickPrompt': 'থ্রেড খুলতে একটি গ্রুপ বেছে নিন',
@@ -165,6 +166,7 @@ export const bn: Partial<Record<string, string>> = {
   'queue.colActions': 'অ্যাকশন',
 
   'settings.title': 'সেটিংস',
+  'settings.backToApp': 'অ্যাপে ফিরুন',
   'settings.pickPrompt': 'পরিচালনা করতে একটি সেটিং বেছে নিন',
   'settings.profile': 'প্রোফাইল',
   'settings.role': 'ভূমিকা',
@@ -226,7 +228,7 @@ export const bn: Partial<Record<string, string>> = {
   'member.orders': 'অর্ডার',
   'member.filters': 'ফিল্টার',
   'member.select': 'নির্বাচন',
-  'member.selectMultiple': 'একাধিক নির্বাচন',
+  'member.selectMultiple': 'নির্বাচন',
   'member.orderSelected': 'অর্ডার',
   'member.done': 'বন্ধ',
   'member.edit': 'এডিট',

@@ -1,61 +1,10 @@
 .fdShell {
   display: flex;
   height: 100%;
-  flex-direction: column;
   background: var(--fd-surface);
 }
 
-.fdHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--fd-space) calc(var(--fd-space) * 2);
-  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
-  background: var(--fd-bg);
-}
-
-.fdHeaderBrand {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--fd-space) * 0.75);
-
-  img {
-    height: calc(var(--fd-space) * 3);
-  }
-}
-
-.fdHeaderTitle {
-  padding-left: calc(var(--fd-space) * 0.75);
-  border-left: 1px solid var(--fd-border);
-  font-size: calc(var(--fd-font) * 0.93);
-  font-weight: 600;
-}
-
-.fdHeaderUser {
-  display: flex;
-  align-items: center;
-  gap: var(--fd-space);
-}
-
-.fdAvatar {
-  display: flex;
-  width: calc(var(--fd-space) * 3.5);
-  height: calc(var(--fd-space) * 3.5);
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--fd-primary);
-  color: #fff;
-  font-size: calc(var(--fd-font) * 0.93);
-  font-weight: 700;
-}
-
-.fdBody {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-}
-
+/* ===== Sidebar ===== */
 .fdSidebar {
   display: flex;
   width: 100%;
@@ -64,6 +13,128 @@
   background: var(--fd-bg);
 }
 
+.fdSideTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fd-space);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.5);
+  border-bottom: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+}
+
+.fdBrand {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  img {
+    height: calc(var(--fd-space) * 3);
+    flex-shrink: 0;
+  }
+}
+
+.fdBrandTitle {
+  font-size: calc(var(--fd-font) * 0.95);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdCollapse {
+  display: none; /* desktop only */
+  flex-shrink: 0;
+}
+
+/* ===== Bottom: profile + settings + logout ===== */
+.fdSideBottom {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  padding: var(--fd-space);
+  border-top: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+}
+
+.fdProfile {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  min-width: 0;
+  padding: calc(var(--fd-space) * 0.75);
+}
+
+.fdProfileAvatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: calc(var(--fd-space) * 4);
+  height: calc(var(--fd-space) * 4);
+  border-radius: 50%;
+  background: var(--fd-primary);
+  color: #fff;
+  font-weight: 700;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.fdProfileMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fdProfileName {
+  font-weight: 600;
+  font-size: calc(var(--fd-font) * 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdProfileEmail {
+  font-size: calc(var(--fd-font) * 0.78);
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdSideAction {
+  display: flex;
+  align-items: center;
+  gap: var(--fd-space);
+  padding: calc(var(--fd-space) * 0.85) calc(var(--fd-space) * 0.75);
+  border: none;
+  border-radius: var(--fd-radius);
+  background: none;
+  color: var(--fd-text);
+  font-size: calc(var(--fd-font) * 0.9);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+
+  & [class*='wm-'] {
+    flex-shrink: 0;
+    font-size: calc(var(--fd-font) * 1.15);
+  }
+
+  &:hover {
+    background: var(--fd-surface);
+  }
+}
+
+/* ===== Main pane ===== */
 .fdMain {
   display: none;
   flex-direction: column;
@@ -80,11 +151,13 @@
   display: flex;
 }
 
-/* Tablet and up: two-pane layout, both always visible. */
+/* ===== Tablet and up: two panes, collapsible sidebar ===== */
 @media (min-width: 48rem) {
   .fdSidebar {
-    width: 15rem;
+    width: 17rem;
+    flex-shrink: 0;
     border-right: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 30%);
+    transition: width 0.18s ease;
   }
 
   .fdMain {
@@ -94,10 +167,26 @@
   .fdShell[data-selection='true'] .fdSidebar {
     display: flex;
   }
-}
 
-@media (min-width: 64rem) {
-  .fdSidebar {
-    width: 17rem;
+  .fdCollapse {
+    display: inline-flex;
+  }
+
+  /* Collapsed → icons only. */
+  .fdSidebar[data-collapsed='true'] {
+    width: 4.5rem;
+  }
+
+  .fdSidebar[data-collapsed='true'] .fdBrand,
+  .fdSidebar[data-collapsed='true'] .fdBrandTitle,
+  .fdSidebar[data-collapsed='true'] .fdProfileMeta,
+  .fdSidebar[data-collapsed='true'] .fdSideActionLabel {
+    display: none;
+  }
+
+  .fdSidebar[data-collapsed='true'] .fdSideTop,
+  .fdSidebar[data-collapsed='true'] .fdProfile,
+  .fdSidebar[data-collapsed='true'] .fdSideAction {
+    justify-content: center;
   }
 }

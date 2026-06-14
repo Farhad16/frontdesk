@@ -33,6 +33,7 @@ export const en = {
 
   'groups.title': 'Groups',
   'groups.searchPlaceholder': 'Search groups',
+  'groups.toggleSidebar': 'Toggle sidebar',
   'groups.noResults': 'No groups match your search.',
   'groups.noMessages': 'No messages yet',
   'groups.pickPrompt': 'Pick a group to open its thread',
@@ -164,6 +165,7 @@ export const en = {
   'queue.colActions': 'Actions',
 
   'settings.title': 'Settings',
+  'settings.backToApp': 'Back to app',
   'settings.pickPrompt': 'Pick a setting to manage',
   'settings.profile': 'Profile',
   'settings.role': 'Role',
@@ -225,7 +227,7 @@ export const en = {
   'member.orders': 'orders',
   'member.filters': 'Filters',
   'member.select': 'Select',
-  'member.selectMultiple': 'Select multiple',
+  'member.selectMultiple': 'Select',
   'member.orderSelected': 'Order',
   'member.done': 'Close',
   'member.edit': 'Edit',

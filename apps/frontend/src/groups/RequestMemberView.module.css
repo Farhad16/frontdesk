@@ -1,7 +1,6 @@
 /* Panel = soft gray; cards = white + shadow (matches proto design language).
    App tokens are bg=#fff / surface=#f5f5f5, so a card needs white-on-gray. */
 .fdMember {
-  --panel: color-mix(in srgb, var(--fd-surface), var(--fd-text) 5%);
   --card-radius: calc(var(--fd-radius) * 1.5);
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.07);
   --card-shadow-hover: 0 0.375rem 1rem rgb(0 0 0 / 0.1);
@@ -14,7 +13,6 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: var(--panel);
 }
 
 /* wm-* icons are an icon font — tie their glyph size to the element font. */
@@ -23,12 +21,11 @@
   line-height: 1;
 }
 
-/* Quick picks aside: top on mobile (height-capped), right column on desktop. */
+/* Quick picks aside: a short horizontal strip on mobile (so orders stay
+   visible), a right-hand column on desktop. */
 .fdSide {
   order: -1;
   flex-shrink: 0;
-  max-height: 40vh;
-  overflow-y: auto;
   padding: calc(var(--fd-space) * 1.75);
   border-bottom: 1px solid var(--hair);
 }
@@ -51,8 +48,7 @@
 
   .fdSide {
     order: 2;
-    width: 18rem;
-    max-height: none;
+    width: 21rem;
     overflow-y: auto;
     border-bottom: none;
     border-left: 1px solid var(--hair);
@@ -68,21 +64,42 @@
   color: var(--muted);
 }
 
-/* Quick picks: compact one-tap list rows (matches proto). ------------- */
+/* Quick picks: compact one-tap cards. Mobile = horizontal scroll strip
+   (stays short so orders show); desktop = vertical list (see media query). */
 .fdQuickRow {
   display: flex;
-  flex-direction: column;
+  align-items: stretch;
   gap: calc(var(--fd-space) * 0.75);
+  overflow-x: auto;
+  padding-bottom: calc(var(--fd-space) * 0.5);
+}
+
+.fdQuickRow > .fdQuickCard {
+  flex: 0 0 13rem;
+}
+
+/* Desktop: quick picks stack vertically in the right column (placed AFTER the
+   mobile base so it wins on source order, not just specificity). */
+@media (min-width: 48rem) {
+  .fdQuickRow {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+
+  .fdQuickRow > .fdQuickCard {
+    flex: initial;
+    width: 100%;
+  }
 }
 
 .fdQuickCard {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--fd-space);
-  width: 100%;
   padding: calc(var(--fd-space) * 0.85) var(--fd-space);
   border: none;
-  border-radius: var(--card-radius);
+  border-radius: 0.25rem; /* 4px */
   background: var(--fd-bg);
   box-shadow: var(--card-shadow);
   text-align: left;
@@ -100,7 +117,9 @@
   }
 
   &[data-picked="true"] {
-    box-shadow: 0 0 0 0.125rem var(--fd-primary);
+    background: rgb(
+      27 135 230 / 0.08
+    ); /* match WuDataTable selected-row bg (wu-blue-p @ 8%) */
   }
 }
 
@@ -110,22 +129,13 @@
   line-height: 1;
 }
 
+/* WuCheckbox indicator on the left of the card. pointer-events:none → the
+   card click handles selection. */
 .fdPickTick {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 1.5px solid var(--hair);
-  border-radius: 50%;
-  font-size: calc(var(--fd-font) * 0.8);
-  font-weight: 700;
-  color: var(--fd-bg);
-
-  &[data-on="true"] {
-    border-color: var(--fd-primary);
-    background: var(--fd-primary);
-  }
+  pointer-events: none;
 }
 
 .fdPickBar {
@@ -244,8 +254,9 @@
   padding-block: 0;
 }
 
-/* Icon-only buttons stay square at that height. */
-.fdMember .fdIconBtn {
+/* Icon-only buttons stay square at that height (compound selector beats
+   wick-ui's primary min-width: 90px). */
+.fdMember .fdBtn.fdIconBtn {
   width: 2rem;
   min-width: 2rem;
   padding-inline: 0;
@@ -497,7 +508,7 @@
 /* Compose bar (pinned bottom of the left column) ----------------------- */
 .fdComposeBar {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: var(--fd-space);
   padding: calc(var(--fd-space) * 1.5) calc(var(--fd-space) * 1.75);
   border-top: 1px solid var(--hair);
@@ -505,10 +516,12 @@
 }
 
 .fdBuildBtn {
-  align-self: flex-start;
+  flex-shrink: 0;
 }
 
 .fdOpenForm {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: var(--fd-space);

@@ -70,6 +70,25 @@
   padding: calc(var(--fd-space) * 0.75);
 }
 
+.fdNavBack {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.4);
+  margin-bottom: calc(var(--fd-space) * 0.5);
+  padding: calc(var(--fd-space) * 0.6) calc(var(--fd-space) * 0.75);
+  border: none;
+  border-radius: var(--fd-radius);
+  background: none;
+  color: var(--fd-primary);
+  font-size: calc(var(--fd-font) * 0.9);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fd-surface);
+  }
+}
+
 .fdNavProfile {
   display: flex;
   align-items: center;

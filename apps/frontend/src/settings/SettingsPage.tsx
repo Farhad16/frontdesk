@@ -1,8 +1,8 @@
 import type {Availability, ICatalogItem, IUserPreference, NotificationPref} from '@frontdesk/types'
 import {WuButton, WuInput} from '@npm-questionpro/wick-ui-lib'
 import {useEffect, useState, type ChangeEvent} from 'react'
+import {useNavigate} from 'react-router-dom'
 import {useAuth} from '../auth/AuthContext'
-import {AppHeader} from '../components/AppHeader'
 import {useCatalog} from '../groups/useCatalog'
 import {usePreferences} from '../groups/usePreferences'
 import {t, type Locale} from '../i18n'
@@ -45,12 +45,19 @@ const AVAILABILITY_OPTIONS: Array<{value: Availability; labelKey: string}> = [
 
 export function SettingsPage() {
   const {user, updateUser, logout} = useAuth()
+  const navigate = useNavigate()
   const {setLocale} = useLanguage()
   const {preferences, save, remove, find} = usePreferences()
   const catalogSections = useCatalog()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
-  const [active, setActive] = useState<SectionKey | null>(null)
+  // Desktop shows nav + content side by side → open Profile by default.
+  // Mobile shows one pane, so start on the section list.
+  const [active, setActive] = useState<SectionKey | null>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 48rem)').matches
+      ? 'profile'
+      : null,
+  )
   const [picking, setPicking] = useState(false)
   const [editorItem, setEditorItem] = useState<ICatalogItem | null>(null)
   const [nameDraft, setNameDraft] = useState('')
@@ -154,6 +161,14 @@ export function SettingsPage() {
 
   const nav = (
     <nav className={styles.fdNav}>
+      <button
+        type="button"
+        className={styles.fdNavBack}
+        onClick={() => navigate('/groups')}
+      >
+        <span aria-hidden="true">‹</span> {t('settings.backToApp')}
+      </button>
+
       <div className={styles.fdNavProfile}>
         {user.photoUrl ? (
           <img className={styles.fdNavAvatar} src={user.photoUrl} alt={user.name} />
@@ -200,7 +215,6 @@ export function SettingsPage() {
 
   return (
     <div className={styles.fdShell} data-selection={active !== null}>
-      <AppHeader />
       <div className={styles.fdBody}>
         <aside className={styles.fdSidebar}>{nav}</aside>
         <main className={styles.fdMain}>

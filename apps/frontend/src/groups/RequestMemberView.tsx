@@ -6,6 +6,7 @@ import type {
 } from "@frontdesk/types";
 import {
   WuButton,
+  WuCheckbox,
   WuDataTable,
   WuInput,
   type IWuTableColumnDef,
@@ -336,7 +337,7 @@ export function RequestMemberView() {
       header: t("queue.colRequest"),
       cell: ({ row }) =>
         renderSummary(row.original.message, row.original.summary),
-      size: 200,
+      size: 250,
     },
     {
       accessorKey: "time",
@@ -452,6 +453,11 @@ export function RequestMemberView() {
                       pickMode ? togglePick(pref.itemKey) : orderQuickPick(pref)
                     }
                   >
+                    {pickMode && (
+                      <span className={styles.fdPickTick} aria-hidden="true">
+                        <WuCheckbox checked={picked} onChange={() => {}} />
+                      </span>
+                    )}
                     <span className={styles.fdQuickEmoji} aria-hidden="true">
                       {item.emoji}
                     </span>
@@ -471,15 +477,6 @@ export function RequestMemberView() {
                         {quickPickSummary(item, pref.options)}
                       </span>
                     </span>
-                    {pickMode && (
-                      <span
-                        className={styles.fdPickTick}
-                        data-on={picked}
-                        aria-hidden="true"
-                      >
-                        {picked ? "✓" : ""}
-                      </span>
-                    )}
                   </button>
                 );
               })}
@@ -508,7 +505,7 @@ export function RequestMemberView() {
                 <WuButton
                   type="button"
                   size="sm"
-                  variant={filtersOpen ? "primary" : "iconOnly"}
+                  variant="iconOnly"
                   className={`${styles.fdBtn} ${styles.fdIconBtn}`}
                   aria-label={t("member.filters")}
                   aria-expanded={filtersOpen}
@@ -599,6 +596,8 @@ export function RequestMemberView() {
                         size="sm"
                         variant="outline"
                         className={styles.fdBtn}
+                        aria-label={t("status.cancel")}
+                        title={t("status.cancel")}
                         Icon={<span className="wm-close" aria-hidden="true" />}
                         onClick={() =>
                           cancelOrders(
@@ -618,6 +617,8 @@ export function RequestMemberView() {
                       size="sm"
                       variant="outline"
                       className={`${styles.fdBtn} ${styles.fdBulkDanger}`}
+                      aria-label={t("member.delete")}
+                      title={t("member.delete")}
                       Icon={<span className="wm-delete" aria-hidden="true" />}
                       onClick={() =>
                         deleteOrders(
@@ -643,13 +644,14 @@ export function RequestMemberView() {
 
         <div className={styles.fdComposeBar}>
           <WuButton
-            variant="primary"
-            className={styles.fdBuildBtn}
+            type="button"
+            variant="iconOnly"
+            className={`${styles.fdBtn} ${styles.fdIconBtn} ${styles.fdBuildBtn}`}
+            aria-label={t("member.buildOrder")}
+            title={t("member.buildOrder")}
             Icon={<span className="wm-add" aria-hidden="true" />}
             onClick={openBuilder}
-          >
-            {t("member.buildOrder")}
-          </WuButton>
+          />
           <form className={styles.fdOpenForm} onSubmit={submitOpenMessage}>
             <WuInput
               variant="outlined"
@@ -660,13 +662,13 @@ export function RequestMemberView() {
             />
             <WuButton
               type="submit"
-              variant="primary"
-              className={styles.fdSendBtn}
+              variant="iconOnly"
+              className={`${styles.fdBtn} ${styles.fdIconBtn} ${styles.fdSendBtn}`}
+              aria-label={t("member.openSend")}
+              title={t("member.openSend")}
               Icon={<span className="wm-send" aria-hidden="true" />}
               disabled={!openText.trim()}
-            >
-              {t("member.openSend")}
-            </WuButton>
+            />
           </form>
         </div>
       </div>
