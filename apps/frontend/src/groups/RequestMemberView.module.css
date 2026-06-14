@@ -18,7 +18,7 @@
 }
 
 /* wm-* icons are an icon font — tie their glyph size to the element font. */
-.fdMember [class*='wm-'] {
+.fdMember [class*="wm-"] {
   font-size: var(--fd-font); /* 14px */
   line-height: 1;
 }
@@ -87,7 +87,9 @@
   box-shadow: var(--card-shadow);
   text-align: left;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.12s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.12s ease;
 
   &:hover {
     box-shadow: var(--card-shadow-hover);
@@ -97,7 +99,7 @@
     transform: scale(0.99);
   }
 
-  &[data-picked='true'] {
+  &[data-picked="true"] {
     box-shadow: 0 0 0 0.125rem var(--fd-primary);
   }
 }
@@ -120,7 +122,7 @@
   font-weight: 700;
   color: var(--fd-bg);
 
-  &[data-on='true'] {
+  &[data-on="true"] {
     border-color: var(--fd-primary);
     background: var(--fd-primary);
   }
@@ -251,7 +253,7 @@
 
 /* wick-ui drops the outline border (1px -> 0) on hover, shifting content.
    Keep it 1px so the button doesn't jump. */
-.fdMember .fdBtn[data-variant='outline']:hover:not(:disabled) {
+.fdMember .fdBtn[data-variant="outline"]:hover:not(:disabled) {
   border-width: 1px;
 }
 
@@ -261,9 +263,11 @@
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transition: grid-template-rows 0.24s ease, opacity 0.24s ease;
+  transition:
+    grid-template-rows 0.24s ease,
+    opacity 0.24s ease;
 
-  &[data-open='true'] {
+  &[data-open="true"] {
     grid-template-rows: 1fr;
     opacity: 1;
   }
@@ -310,7 +314,10 @@
   font-size: calc(var(--fd-font) * 0.8);
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
 
   &:hover {
     border-color: var(--fd-primary);
@@ -341,9 +348,11 @@
   background: var(--fd-bg);
   box-shadow: var(--card-shadow);
   min-height: 2.75rem;
-  transition: background 0.12s ease, border-color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
 
-  &[data-active='true'] {
+  &[data-active="true"] {
     border-color: color-mix(in srgb, var(--fd-primary), transparent 55%);
     background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 92%);
   }
@@ -401,13 +410,15 @@
   border-radius: var(--card-radius);
   background: var(--fd-bg);
   box-shadow: var(--card-shadow);
-  transition: opacity 0.15s ease, box-shadow 0.12s ease;
+  transition:
+    opacity 0.15s ease,
+    box-shadow 0.12s ease;
 
-  &[data-busy='true'] {
+  &[data-busy="true"] {
     opacity: 0.45;
   }
 
-  &[data-selected='true'] {
+  &[data-selected="true"] {
     box-shadow: 0 0 0 0.125rem var(--fd-primary);
   }
 }
@@ -421,8 +432,19 @@
 
 .fdOrderSummary {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  padding: var(--fd-space) 0;
   font-weight: 500;
   color: var(--ink);
+}
+
+/* Each cart line item on its own row inside the summary cell.
+   Vertical spacing comes from the table cell's own y-padding, not here. */
+.fdOrderLine {
+  display: block;
+  padding-left: var(--fd-space);
 }
 
 .fdOrderMeta {
@@ -443,22 +465,22 @@
   font-weight: 700;
   white-space: nowrap;
 
-  &[data-status='pending'] {
+  &[data-status="pending"] {
     background: color-mix(in srgb, #b45309, var(--fd-bg) 86%);
     color: #b45309;
   }
 
-  &[data-status='in_progress'] {
+  &[data-status="in_progress"] {
     background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 86%);
     color: var(--fd-primary);
   }
 
-  &[data-status='done'] {
+  &[data-status="done"] {
     background: color-mix(in srgb, #15803d, var(--fd-bg) 86%);
     color: #15803d;
   }
 
-  &[data-status='cancelled'] {
+  &[data-status="cancelled"] {
     background: color-mix(in srgb, var(--fd-error), var(--fd-bg) 86%);
     color: var(--fd-error);
   }
@@ -525,7 +547,7 @@
   overflow: hidden;
   animation: fdSnackIn 0.18s ease;
 
-  &[data-kind='cancel'] {
+  &[data-kind="cancel"] {
     background: color-mix(in srgb, var(--fd-error), black 12%);
   }
 }

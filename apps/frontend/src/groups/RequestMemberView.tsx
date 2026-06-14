@@ -54,6 +54,21 @@ function startOfWeek(date: Date): number {
   ).getTime();
 }
 
+// Track a min-width breakpoint so we can show a table on desktop and a simpler
+// card list on phones.
+function useMinWidth(query: string): boolean {
+  const [matches, setMatches] = useState(
+    () => window.matchMedia(`(min-width: ${query})`).matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${query})`);
+    const onChange = () => setMatches(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
 interface IPendingAction {
   id: string;
   kind: "send" | "cancel" | "delete";
@@ -89,7 +104,6 @@ export function RequestMemberView() {
   const [editing, setEditing] = useState<IMessage | null>(null);
   const [openText, setOpenText] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [selectMode, setSelectMode] = useState(false);
   const [pickMode, setPickMode] = useState(false);
   const [pickedPicks, setPickedPicks] = useState<Set<string>>(new Set());
   const [statusFilter, setStatusFilter] = useState<Status | "ALL">("ALL");
@@ -100,6 +114,7 @@ export function RequestMemberView() {
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
   const catalog = config?.catalog ?? [];
+  const isDesktop = useMinWidth("48rem");
 
   // Clear any in-flight hold timers on unmount so nothing fires after teardown.
   useEffect(() => {
@@ -264,13 +279,6 @@ export function RequestMemberView() {
     setSelectedRows([]);
   }
 
-  function toggleSelectMode() {
-    setSelectMode((on) => {
-      if (on) setSelectedRows([]);
-      return !on;
-    });
-  }
-
   function openBuilder() {
     setEditing(null);
     setBuilderOpen(true);
@@ -303,14 +311,32 @@ export function RequestMemberView() {
     return count === 1 && sample ? sample : `${count} ${t("member.orders")}`;
   }
 
+  // Render a request's line items each on their own row (shared by table + cards).
+  function renderSummary(message: IMessage, fallback: string) {
+    const payload = message.payload;
+    const items = payload && "items" in payload ? payload.items : null;
+    const lines =
+      items && items.length > 0
+        ? items.map((l) => l.summary ?? "")
+        : [fallback];
+    return (
+      <span className={styles.fdOrderSummary}>
+        {lines.map((line, index) => (
+          <span key={index} className={styles.fdOrderLine}>
+            {line}
+          </span>
+        ))}
+      </span>
+    );
+  }
+
   const orderColumns: IWuTableColumnDef<IOrderRow>[] = [
     {
       accessorKey: "summary",
       header: t("queue.colRequest"),
-      cell: ({ row }) => (
-        <span className={styles.fdOrderSummary}>{row.original.summary}</span>
-      ),
-      size: 700,
+      cell: ({ row }) =>
+        renderSummary(row.original.message, row.original.summary),
+      size: 200,
     },
     {
       accessorKey: "time",
@@ -318,6 +344,7 @@ export function RequestMemberView() {
       cell: ({ row }) => (
         <span className={styles.fdOrderTime}>{row.original.time}</span>
       ),
+      size: 150,
     },
     {
       accessorKey: "statusKey",
@@ -331,6 +358,7 @@ export function RequestMemberView() {
             {t(`status.${row.original.statusKey}`)}
           </span>
         ) : null,
+      size: 150,
     },
     {
       accessorKey: "actions",
@@ -339,11 +367,7 @@ export function RequestMemberView() {
       cellAlign: "right",
       cell: ({ row }) => {
         const message = row.original.message;
-        if (
-          selectMode ||
-          message.status !== "PENDING" ||
-          pendingTargetIds.has(message.id)
-        ) {
+        if (message.status !== "PENDING" || pendingTargetIds.has(message.id)) {
           return null;
         }
         return (
@@ -371,6 +395,7 @@ export function RequestMemberView() {
           </span>
         );
       },
+      size: 100,
     },
   ];
 
@@ -480,24 +505,6 @@ export function RequestMemberView() {
             <div className={styles.fdHeadRow}>
               <h2 className={styles.fdSectionTitle}>{t("member.myOrders")}</h2>
               <div className={styles.fdHeadActions}>
-                {myOrders.length > 0 && (
-                  <WuButton
-                    type="button"
-                    size="sm"
-                    variant={selectMode ? "primary" : "outline"}
-                    className={styles.fdBtn}
-                    aria-pressed={selectMode}
-                    Icon={
-                      <span
-                        className={selectMode ? "wm-close" : "wm-checklist"}
-                        aria-hidden="true"
-                      />
-                    }
-                    onClick={toggleSelectMode}
-                  >
-                    {selectMode ? t("member.done") : t("member.select")}
-                  </WuButton>
-                )}
                 <WuButton
                   type="button"
                   size="sm"
@@ -573,22 +580,19 @@ export function RequestMemberView() {
             <WuDataTable
               data={orderRows}
               columns={orderColumns}
-              size="compact"
+              size="default"
               stickyHeader
               isLoading={loading}
               rowSelection={{
-                isEnabled: selectMode,
+                isEnabled: true,
                 selectedRows,
                 onRowSelect: setSelectedRows,
                 rowUniqueKey: "id",
                 isRowDisabled: (row) => pendingTargetIds.has(row.id),
               }}
               HeaderAction={
-                selectMode && selectedRows.length > 0 ? (
+                selectedRows.length > 0 ? (
                   <span className={styles.fdToolbarActions}>
-                    <span className={styles.fdToolbarCount}>
-                      {`${selectedRows.length} ${t("member.selected")}`}
-                    </span>
                     {selectedAllPending && (
                       <WuButton
                         type="button"
@@ -635,119 +639,6 @@ export function RequestMemberView() {
               }
             />
           </div>
-
-          {/* Legacy card-list view — kept for quick revert if the table isn't
-              good enough. Do not delete.
-          {myOrders.length > 0 && (
-            <>
-              {selectMode && (
-                <div className={styles.fdToolbar} data-active={selected.size > 0}>
-                  <WuCheckbox
-                    checked={allSelected}
-                    onChange={toggleSelectAll}
-                    Label={
-                      selected.size > 0
-                        ? `${selected.size} ${t('member.selected')}`
-                        : t('member.selectAll')
-                    }
-                  />
-                  {selected.size > 0 && (
-                    <span className={styles.fdToolbarActions}>
-                      {selectedAllPending && (
-                        <WuButton
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className={styles.fdBtn}
-                          Icon={<span className="wm-close" aria-hidden="true" />}
-                          onClick={() =>
-                            cancelOrders(
-                              selectedOrders.map(m => m.id),
-                              bulkLabel(selectedOrders.length, selectedOrders[0]?.summary ?? undefined),
-                            )
-                          }
-                        >
-                          {t('status.cancel')}
-                        </WuButton>
-                      )}
-                      <WuButton
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className={`${styles.fdBtn} ${styles.fdBulkDanger}`}
-                        Icon={<span className="wm-delete" aria-hidden="true" />}
-                        onClick={() =>
-                          deleteOrders(
-                            selectedOrders.map(m => m.id),
-                            bulkLabel(selectedOrders.length, selectedOrders[0]?.summary ?? undefined),
-                          )
-                        }
-                      >
-                        {t('member.delete')}
-                      </WuButton>
-                    </span>
-                  )}
-                </div>
-              )}
-
-              <ul className={styles.fdOrders}>
-                {myOrders.map(message => {
-                  const status = message.status?.toLowerCase()
-                  const busy = pendingTargetIds.has(message.id)
-                  return (
-                    <li
-                      key={message.id}
-                      className={styles.fdOrder}
-                      data-busy={busy}
-                      data-selected={selectMode && selected.has(message.id)}
-                    >
-                      {selectMode && (
-                        <WuCheckbox
-                          checked={selected.has(message.id)}
-                          disabled={busy}
-                          onChange={() => toggleSelect(message.id)}
-                        />
-                      )}
-                      <span className={styles.fdOrderSummary}>{message.summary}</span>
-                      <span className={styles.fdOrderMeta}>
-                        <span className={styles.fdOrderTime}>{formatTime(message.createdAt)}</span>
-                        {status && (
-                          <span className={styles.fdStatusChip} data-status={status}>
-                            {t(`status.${status}`)}
-                          </span>
-                        )}
-                      </span>
-                      {!selectMode && !busy && message.status === 'PENDING' && (
-                        <span className={styles.fdOrderActions}>
-                          <WuButton
-                            type="button"
-                            size="sm"
-                            variant="iconOnly"
-                            className={`${styles.fdBtn} ${styles.fdIconBtn}`}
-                            aria-label={t('member.edit')}
-                            title={t('member.edit')}
-                            Icon={<span className="wm-edit" aria-hidden="true" />}
-                            onClick={() => openEdit(message)}
-                          />
-                          <WuButton
-                            type="button"
-                            size="sm"
-                            variant="iconOnly"
-                            className={`${styles.fdBtn} ${styles.fdIconBtn}`}
-                            aria-label={t('status.cancel')}
-                            title={t('status.cancel')}
-                            Icon={<span className="wm-close" aria-hidden="true" />}
-                            onClick={() => cancelOrders([message.id], message.summary ?? '')}
-                          />
-                        </span>
-                      )}
-                    </li>
-                  )
-                })}
-              </ul>
-            </>
-          )}
-          */}
         </section>
 
         <div className={styles.fdComposeBar}>
