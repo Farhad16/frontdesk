@@ -1,5 +1,11 @@
 import {Injectable, NotFoundException} from '@nestjs/common'
-import {GROUP_CONFIGS, SEEDED_GROUP_KEYS, type IGroupConfig, type IGroupSummary} from '@frontdesk/types'
+import {
+  GROUP_CONFIGS,
+  SEEDED_GROUP_KEYS,
+  type ICatalogItem,
+  type IGroupConfig,
+  type IGroupSummary,
+} from '@frontdesk/types'
 import {PrismaService} from '../prisma/prisma.service'
 
 @Injectable()
@@ -44,5 +50,20 @@ export class GroupsService {
     const config = GROUP_CONFIGS[key]
     if (!config) throw new NotFoundException('Group not found')
     return config
+  }
+
+  catalogItems(): ICatalogItem[] {
+    const items: ICatalogItem[] = []
+    const seen = new Set<string>()
+    for (const key of SEEDED_GROUP_KEYS) {
+      for (const category of GROUP_CONFIGS[key]?.catalog ?? []) {
+        for (const item of category.items ?? []) {
+          if (seen.has(item.key)) continue
+          seen.add(item.key)
+          items.push(item)
+        }
+      }
+    }
+    return items
   }
 }

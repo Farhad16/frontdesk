@@ -169,5 +169,8 @@ export const bn: Partial<Record<string, string>> = {
   'settings.back': 'ফিরে যান',
   'settings.quickPicks': 'কুইক পিক',
   'settings.quickPicksHint': 'সংরক্ষিত আইটেম ডিফল্ট — অর্ডার বিল্ডার থেকে সেট করুন, এখানে পরিচালনা করুন।',
-  'settings.quickPicksEmpty': 'এখনো কোনো কুইক পিক নেই। অর্ডার বিল্ডার থেকে সংরক্ষণ করুন।',
+  'settings.quickPicksEmpty': 'এখনো কোনো কুইক পিক নেই।',
+  'settings.newQuickPick': '＋ নতুন কুইক পিক',
+  'settings.chooseItem': 'একটি আইটেম বেছে নিন',
+  'settings.edit': 'এডিট',
 }

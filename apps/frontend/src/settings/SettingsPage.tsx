@@ -1,12 +1,14 @@
-import type {Availability, NotificationPref} from '@frontdesk/types'
+import type {Availability, ICatalogItem, IUserPreference, NotificationPref} from '@frontdesk/types'
 import {WuButton, WuInput} from '@npm-questionpro/wick-ui-lib'
 import {useState} from 'react'
 import {useAuth} from '../auth/AuthContext'
 import {AppHeader} from '../components/AppHeader'
+import {useCatalog} from '../groups/useCatalog'
 import {usePreferences} from '../groups/usePreferences'
 import {t, type Locale} from '../i18n'
 import {useLanguage} from '../i18n/LanguageContext'
 import {enablePush, getPushStatus, type PushStatus} from '../lib/push'
+import {QuickPickEditor} from './QuickPickEditor'
 import styles from './SettingsPage.module.css'
 
 type SectionKey = 'profile' | 'language' | 'notifications' | 'availability' | 'quickPicks' | 'addOns'
@@ -36,11 +38,25 @@ const AVAILABILITY_OPTIONS: Array<{value: Availability; labelKey: string}> = [
 export function SettingsPage() {
   const {user, updateUser, logout} = useAuth()
   const {setLocale} = useLanguage()
-  const {preferences, remove} = usePreferences()
+  const {preferences, save, remove, find} = usePreferences()
+  const catalog = useCatalog()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
   const [active, setActive] = useState<SectionKey>('profile')
   const [detailOpen, setDetailOpen] = useState(false)
+  const [picking, setPicking] = useState(false)
+  const [editorItem, setEditorItem] = useState<ICatalogItem | null>(null)
+
+  function openEditor(item: ICatalogItem) {
+    setEditorItem(item)
+    setPicking(false)
+  }
+
+  function saveQuickPick(options: IUserPreference['options']) {
+    if (!editorItem) return
+    void save(editorItem.key, options)
+    setEditorItem(null)
+  }
 
   if (!user) return null
   const isStaff = user.role === 'STAFF'
@@ -237,34 +253,81 @@ export function SettingsPage() {
             </div>
           )}
 
-          {active === 'quickPicks' && (
-            <>
-              <p className={styles.fdNote}>{t('settings.quickPicksHint')}</p>
-              {preferences.length === 0 ? (
-                <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
-              ) : (
-                <ul className={styles.fdQuickPicks}>
-                  {preferences.map(pref => (
-                    <li key={pref.itemKey} className={styles.fdQuickPick}>
-                      <span className={styles.fdQuickPickText}>
-                        <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
-                        <span className={styles.fdQuickPickSummary}>
-                          {preferenceSummary(pref.options)}
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        aria-label={t('builder.remove')}
-                        onClick={() => void remove(pref.itemKey)}
-                      >
-                        ✕
-                      </button>
-                    </li>
+          {active === 'quickPicks' &&
+            (editorItem ? (
+              <QuickPickEditor
+                item={editorItem}
+                initialOptions={find(editorItem.key)?.options}
+                addOnsLibrary={user.addOns}
+                onSave={saveQuickPick}
+                onCancel={() => setEditorItem(null)}
+              />
+            ) : picking ? (
+              <>
+                <span className={styles.fdEditorLabel}>{t('settings.chooseItem')}</span>
+                <div className={styles.fdChips}>
+                  {catalog.map(item => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={styles.fdChip}
+                      onClick={() => openEditor(item)}
+                    >
+                      {item.emoji} {t(item.labelKey)}
+                    </button>
                   ))}
-                </ul>
-              )}
-            </>
-          )}
+                </div>
+                <div className={styles.fdEditorActions}>
+                  <WuButton variant="outline" size="sm" onClick={() => setPicking(false)}>
+                    {t('lunchoff.cancel')}
+                  </WuButton>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className={styles.fdNote}>{t('settings.quickPicksHint')}</p>
+                {preferences.length === 0 ? (
+                  <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
+                ) : (
+                  <ul className={styles.fdQuickPicks}>
+                    {preferences.map(pref => {
+                      const item = catalog.find(c => c.key === pref.itemKey)
+                      return (
+                        <li key={pref.itemKey} className={styles.fdQuickPick}>
+                          <span className={styles.fdQuickPickText}>
+                            <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
+                            <span className={styles.fdQuickPickSummary}>
+                              {preferenceSummary(pref.options)}
+                            </span>
+                          </span>
+                          {item && (
+                            <button
+                              type="button"
+                              className={styles.fdQuickPickEdit}
+                              onClick={() => openEditor(item)}
+                            >
+                              {t('settings.edit')}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            aria-label={t('builder.remove')}
+                            onClick={() => void remove(pref.itemKey)}
+                          >
+                            ✕
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+                <div className={styles.fdEditorActions}>
+                  <WuButton variant="outline" size="sm" onClick={() => setPicking(true)}>
+                    {t('settings.newQuickPick')}
+                  </WuButton>
+                </div>
+              </>
+            ))}
 
           {active === 'addOns' && (
             <>

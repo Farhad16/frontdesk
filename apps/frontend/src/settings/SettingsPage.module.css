@@ -322,6 +322,55 @@
   font-size: calc(var(--fd-font) * 0.86);
 }
 
+.fdQuickPickEdit {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  color: var(--fd-primary);
+  font: inherit;
+  font-size: calc(var(--fd-font) * 0.86);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fdEditor {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 1.5);
+}
+
+.fdEditorHead {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  font-size: calc(var(--fd-font) * 1.1);
+  font-weight: 700;
+}
+
+.fdEditorEmoji {
+  font-size: calc(var(--fd-font) * 1.3);
+}
+
+.fdEditorPick {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.6);
+}
+
+.fdEditorLabel {
+  color: color-mix(in srgb, var(--fd-text), transparent 20%);
+  font-size: calc(var(--fd-font) * 0.82);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fdEditorActions {
+  display: flex;
+  gap: var(--fd-space);
+  margin-top: var(--fd-space);
+}
+
 .fdInline {
   display: flex;
   gap: var(--fd-space);

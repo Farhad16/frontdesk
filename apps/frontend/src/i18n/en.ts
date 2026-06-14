@@ -164,11 +164,15 @@ export const en = {
   'settings.availabilityAvailable': 'Available',
   'settings.availabilityBusy': 'Busy',
   'settings.availabilityAway': 'Away',
+  'settings.save': 'Save',
   'settings.saved': 'Saved',
   'settings.back': 'Back',
   'settings.quickPicks': 'Quick Picks',
   'settings.quickPicksHint': 'Saved item defaults — set them from the order builder, manage them here.',
-  'settings.quickPicksEmpty': 'No quick picks yet. Save one from the order builder.',
+  'settings.quickPicksEmpty': 'No quick picks yet.',
+  'settings.newQuickPick': '＋ New quick pick',
+  'settings.chooseItem': 'Choose an item',
+  'settings.edit': 'Edit',
 } as const
 
 export type TranslationKey = keyof typeof en
