@@ -6,33 +6,103 @@
   background: var(--fd-surface);
 }
 
-.fdSettingsBody {
+.fdShell {
+  display: flex;
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+}
+
+.fdNav {
+  display: flex;
   width: 100%;
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: calc(var(--fd-space) * 2);
-}
-
-.fdSettingsTitle {
-  margin: 0 0 calc(var(--fd-space) * 2);
-  font-size: calc(var(--fd-font) * 1.5);
-  font-weight: 700;
-}
-
-.fdCard {
-  margin-bottom: calc(var(--fd-space) * 2);
-  padding: calc(var(--fd-space) * 2);
-  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
-  border-radius: calc(var(--fd-radius) * 2);
+  flex-direction: column;
+  gap: calc(var(--fd-space) * 0.25);
+  padding: calc(var(--fd-space) * 1.5);
   background: var(--fd-bg);
 }
 
-.fdCardTitle {
+.fdNavTitle {
   margin: 0 0 var(--fd-space);
-  font-size: var(--fd-font);
+  padding: 0 calc(var(--fd-space) * 0.75);
+  font-size: calc(var(--fd-font) * 1.35);
   font-weight: 700;
+}
+
+.fdNavItem {
+  padding: calc(var(--fd-space) * 0.85) calc(var(--fd-space) * 1.25);
+  border: 0;
+  border-radius: var(--fd-radius);
+  background: none;
+  color: var(--fd-text);
+  font: inherit;
+  font-size: var(--fd-font);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--fd-surface);
+  }
+}
+
+.fdNavItemOn {
+  background: color-mix(in srgb, var(--fd-primary), var(--fd-bg) 90%);
+  color: var(--fd-primary);
+  font-weight: 600;
+}
+
+.fdContent {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: calc(var(--fd-space) * 2.5);
+}
+
+.fdBack {
+  align-self: flex-start;
+  margin-bottom: var(--fd-space);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fd-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fdContentTitle {
+  margin: 0 0 calc(var(--fd-space) * 1.5);
+  font-size: calc(var(--fd-font) * 1.25);
+  font-weight: 700;
+}
+
+/* Mobile: one pane — nav, or detail when a section is opened. */
+.fdShell[data-detail='true'] .fdNav {
+  display: none;
+}
+
+.fdShell[data-detail='true'] .fdContent {
+  display: flex;
+}
+
+@media (min-width: 48rem) {
+  .fdNav {
+    width: 16rem;
+    flex-shrink: 0;
+    border-right: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 35%);
+  }
+
+  .fdContent {
+    display: flex;
+  }
+
+  .fdShell[data-detail='true'] .fdNav {
+    display: flex;
+  }
+
+  .fdBack {
+    display: none;
+  }
 }
 
 .fdProfile {

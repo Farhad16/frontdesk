@@ -9,6 +9,8 @@ import {useLanguage} from '../i18n/LanguageContext'
 import {enablePush, getPushStatus, type PushStatus} from '../lib/push'
 import styles from './SettingsPage.module.css'
 
+type SectionKey = 'profile' | 'language' | 'notifications' | 'availability' | 'quickPicks' | 'addOns'
+
 function preferenceSummary(options: Record<string, string | string[]>): string {
   const parts: string[] = []
   Object.entries(options).forEach(([key, value]) => {
@@ -37,9 +39,25 @@ export function SettingsPage() {
   const {preferences, remove} = usePreferences()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
+  const [active, setActive] = useState<SectionKey>('profile')
+  const [detailOpen, setDetailOpen] = useState(false)
 
   if (!user) return null
   const isStaff = user.role === 'STAFF'
+
+  const sections: Array<{key: SectionKey; labelKey: string}> = [
+    {key: 'profile', labelKey: 'settings.profile'},
+    {key: 'language', labelKey: 'settings.language'},
+    {key: 'notifications', labelKey: 'settings.notifications'},
+    ...(isStaff ? [{key: 'availability' as const, labelKey: 'settings.availability'}] : []),
+    {key: 'quickPicks', labelKey: 'settings.quickPicks'},
+    {key: 'addOns', labelKey: 'settings.addOns'},
+  ]
+
+  function open(section: SectionKey) {
+    setActive(section)
+    setDetailOpen(true)
+  }
 
   async function handleEnablePush() {
     setPushStatus(await enablePush())
@@ -64,78 +82,97 @@ export function SettingsPage() {
   return (
     <div className={styles.fdSettings}>
       <AppHeader />
-      <div className={styles.fdSettingsBody}>
-        <h1 className={styles.fdSettingsTitle}>{t('settings.title')}</h1>
+      <div className={styles.fdShell} data-detail={detailOpen}>
+        <nav className={styles.fdNav}>
+          <h1 className={styles.fdNavTitle}>{t('settings.title')}</h1>
+          {sections.map(section => (
+            <button
+              key={section.key}
+              type="button"
+              className={
+                section.key === active ? `${styles.fdNavItem} ${styles.fdNavItemOn}` : styles.fdNavItem
+              }
+              onClick={() => open(section.key)}
+            >
+              {t(section.labelKey)}
+            </button>
+          ))}
+        </nav>
 
-        <section className={styles.fdCard}>
-          <h2 className={styles.fdCardTitle}>{t('settings.profile')}</h2>
-          <div className={styles.fdProfile}>
-            <span className={styles.fdProfileAvatar}>{user.name.charAt(0).toUpperCase()}</span>
-            <div>
-              <div className={styles.fdProfileName}>{user.name}</div>
-              <div className={styles.fdProfileMeta}>{user.email}</div>
-              <div className={styles.fdProfileMeta}>
-                {t('settings.role')}: {user.role}
+        <section className={styles.fdContent}>
+          <button type="button" className={styles.fdBack} onClick={() => setDetailOpen(false)}>
+            ‹ {t('settings.title')}
+          </button>
+          <h2 className={styles.fdContentTitle}>
+            {t(sections.find(s => s.key === active)?.labelKey ?? 'settings.title')}
+          </h2>
+
+          {active === 'profile' && (
+            <div className={styles.fdProfile}>
+              <span className={styles.fdProfileAvatar}>{user.name.charAt(0).toUpperCase()}</span>
+              <div>
+                <div className={styles.fdProfileName}>{user.name}</div>
+                <div className={styles.fdProfileMeta}>{user.email}</div>
+                <div className={styles.fdProfileMeta}>
+                  {t('settings.role')}: {user.role}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          )}
 
-        <section className={styles.fdCard}>
-          <h2 className={styles.fdCardTitle}>{t('settings.language')}</h2>
-          <div className={styles.fdChips}>
-            <button
-              type="button"
-              className={user.locale === 'en' ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
-              onClick={() => changeLanguage('en')}
-            >
-              {t('settings.languageEn')}
-            </button>
-            <button
-              type="button"
-              className={user.locale === 'bn' ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
-              onClick={() => changeLanguage('bn')}
-            >
-              {t('settings.languageBn')}
-            </button>
-          </div>
-        </section>
-
-        <section className={styles.fdCard}>
-          <h2 className={styles.fdCardTitle}>{t('settings.notifications')}</h2>
-          <div className={styles.fdPushRow}>
-            {pushStatus === 'granted' ? (
-              <span className={styles.fdPushOn}>✓ {t('settings.notificationsEnabled')}</span>
-            ) : pushStatus === 'denied' ? (
-              <span className={styles.fdNote}>{t('settings.notificationsBlocked')}</span>
-            ) : pushStatus === 'unsupported' ? null : (
-              <WuButton variant="primary" size="sm" onClick={handleEnablePush}>
-                {t('settings.enableNotifications')}
-              </WuButton>
-            )}
-          </div>
-          {isStaff ? (
-            <p className={styles.fdNote}>{t('settings.notifStaffForced')}</p>
-          ) : (
-            <div className={styles.fdRadioList}>
-              {NOTIF_OPTIONS.map(option => (
-                <label key={option.value} className={styles.fdRadio}>
-                  <input
-                    type="radio"
-                    name="notif"
-                    checked={user.notificationPref === option.value}
-                    onChange={() => void updateUser({notificationPref: option.value})}
-                  />
-                  {t(option.labelKey)}
-                </label>
-              ))}
+          {active === 'language' && (
+            <div className={styles.fdChips}>
+              <button
+                type="button"
+                className={user.locale === 'en' ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
+                onClick={() => changeLanguage('en')}
+              >
+                {t('settings.languageEn')}
+              </button>
+              <button
+                type="button"
+                className={user.locale === 'bn' ? `${styles.fdChip} ${styles.fdChipOn}` : styles.fdChip}
+                onClick={() => changeLanguage('bn')}
+              >
+                {t('settings.languageBn')}
+              </button>
             </div>
           )}
-        </section>
 
-        {isStaff && (
-          <section className={styles.fdCard}>
-            <h2 className={styles.fdCardTitle}>{t('settings.availability')}</h2>
+          {active === 'notifications' && (
+            <>
+              <div className={styles.fdPushRow}>
+                {pushStatus === 'granted' ? (
+                  <span className={styles.fdPushOn}>✓ {t('settings.notificationsEnabled')}</span>
+                ) : pushStatus === 'denied' ? (
+                  <span className={styles.fdNote}>{t('settings.notificationsBlocked')}</span>
+                ) : pushStatus === 'unsupported' ? null : (
+                  <WuButton variant="primary" size="sm" onClick={handleEnablePush}>
+                    {t('settings.enableNotifications')}
+                  </WuButton>
+                )}
+              </div>
+              {isStaff ? (
+                <p className={styles.fdNote}>{t('settings.notifStaffForced')}</p>
+              ) : (
+                <div className={styles.fdRadioList}>
+                  {NOTIF_OPTIONS.map(option => (
+                    <label key={option.value} className={styles.fdRadio}>
+                      <input
+                        type="radio"
+                        name="notif"
+                        checked={user.notificationPref === option.value}
+                        onChange={() => void updateUser({notificationPref: option.value})}
+                      />
+                      {t(option.labelKey)}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {active === 'availability' && (
             <div className={styles.fdChips}>
               {AVAILABILITY_OPTIONS.map(option => (
                 <button
@@ -152,62 +189,64 @@ export function SettingsPage() {
                 </button>
               ))}
             </div>
-          </section>
-        )}
-
-        <section className={styles.fdCard}>
-          <h2 className={styles.fdCardTitle}>{t('settings.quickPicks')}</h2>
-          <p className={styles.fdNote}>{t('settings.quickPicksHint')}</p>
-          {preferences.length === 0 ? (
-            <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
-          ) : (
-            <ul className={styles.fdQuickPicks}>
-              {preferences.map(pref => (
-                <li key={pref.itemKey} className={styles.fdQuickPick}>
-                  <span className={styles.fdQuickPickText}>
-                    <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
-                    <span className={styles.fdQuickPickSummary}>
-                      {preferenceSummary(pref.options)}
-                    </span>
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={t('builder.remove')}
-                    onClick={() => void remove(pref.itemKey)}
-                  >
-                    ✕
-                  </button>
-                </li>
-              ))}
-            </ul>
           )}
-        </section>
 
-        <section className={styles.fdCard}>
-          <h2 className={styles.fdCardTitle}>{t('settings.addOns')}</h2>
-          <p className={styles.fdNote}>{t('settings.addOnsHint')}</p>
-          <div className={styles.fdChips}>
-            {user.addOns.map(value => (
-              <span key={value} className={styles.fdAddOn}>
-                {value}
-                <button type="button" aria-label="remove" onClick={() => removeAddOn(value)}>
-                  ✕
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className={styles.fdInline}>
-            <WuInput
-              variant="outlined"
-              type="text"
-              placeholder={t('settings.addOnPlaceholder')}
-              value={addOnDraft}
-              onChange={event => setAddOnDraft(event.target.value)}
-            />
-            <WuButton variant="outline" size="sm" disabled={!addOnDraft.trim()} onClick={addAddOn}>
-              {t('settings.add')}
-            </WuButton>
-          </div>
+          {active === 'quickPicks' && (
+            <>
+              <p className={styles.fdNote}>{t('settings.quickPicksHint')}</p>
+              {preferences.length === 0 ? (
+                <p className={styles.fdNote}>{t('settings.quickPicksEmpty')}</p>
+              ) : (
+                <ul className={styles.fdQuickPicks}>
+                  {preferences.map(pref => (
+                    <li key={pref.itemKey} className={styles.fdQuickPick}>
+                      <span className={styles.fdQuickPickText}>
+                        <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
+                        <span className={styles.fdQuickPickSummary}>
+                          {preferenceSummary(pref.options)}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={t('builder.remove')}
+                        onClick={() => void remove(pref.itemKey)}
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          )}
+
+          {active === 'addOns' && (
+            <>
+              <p className={styles.fdNote}>{t('settings.addOnsHint')}</p>
+              <div className={styles.fdChips}>
+                {user.addOns.map(value => (
+                  <span key={value} className={styles.fdAddOn}>
+                    {value}
+                    <button type="button" aria-label={t('builder.remove')} onClick={() => removeAddOn(value)}>
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className={styles.fdInline}>
+                <WuInput
+                  variant="outlined"
+                  type="text"
+                  placeholder={t('settings.addOnPlaceholder')}
+                  value={addOnDraft}
+                  onChange={event => setAddOnDraft(event.target.value)}
+                />
+                <WuButton variant="outline" size="sm" disabled={!addOnDraft.trim()} onClick={addAddOn}>
+                  {t('settings.add')}
+                </WuButton>
+              </div>
+            </>
+          )}
         </section>
       </div>
     </div>
