@@ -1,5 +1,6 @@
-import type {IRequestQueueItem, Role, Status} from '@frontdesk/types'
+import type {ICatalog, IRequestQueueItem, Role, Status} from '@frontdesk/types'
 import {WuButton} from '@npm-questionpro/wick-ui-lib'
+import {localizeRequestSummary} from '../groups/builderSummary'
 import {actionsFor} from '../groups/statusActions'
 import {formatTime} from '../groups/threadFormat'
 import {t} from '../i18n'
@@ -7,14 +8,19 @@ import styles from './QueuePage.module.css'
 
 interface IQueueRowProps {
   item: IRequestQueueItem
+  catalog: ICatalog
   currentUserId?: string
   currentRole?: Role
   onUpdateStatus: (groupKey: string, messageId: string, status: Status) => void
   onDelete: (groupKey: string, messageId: string) => void
 }
 
-export function QueueRow({item, currentUserId, currentRole, onUpdateStatus, onDelete}: IQueueRowProps) {
+export function QueueRow({item, catalog, currentUserId, currentRole, onUpdateStatus, onDelete}: IQueueRowProps) {
   const {message, groupKey} = item
+  const requestText =
+    message.payload && 'items' in message.payload && message.payload.items.length > 0
+      ? localizeRequestSummary(message.payload.items, catalog)
+      : (message.summary ?? '')
   const actions =
     message.status && currentRole
       ? actionsFor(message.status, currentRole, message.sender.id === currentUserId)
@@ -31,7 +37,7 @@ export function QueueRow({item, currentUserId, currentRole, onUpdateStatus, onDe
         {message.sender.name}
       </span>
       <span className={styles.fdRequest} data-label={t('queue.colRequest')}>
-        {message.summary}
+        {requestText}
       </span>
       <span className={styles.fdTimeCell} data-label={t('queue.colTime')}>
         {formatTime(message.createdAt)}

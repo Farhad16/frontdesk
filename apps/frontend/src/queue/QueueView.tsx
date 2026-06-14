@@ -117,6 +117,7 @@ export function QueueView() {
               <QueueRow
                 key={item.message.id}
                 item={item}
+                catalog={config?.catalog ?? []}
                 currentUserId={user?.id}
                 currentRole={user?.role}
                 onUpdateStatus={updateStatus}

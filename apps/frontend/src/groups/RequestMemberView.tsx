@@ -15,6 +15,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { t } from "../i18n";
+import { localizeLine } from "./builderSummary";
 import { buildQuickPickInput, locate, quickPickSummary } from "./quickPick";
 import { RequestBuilder } from "./RequestBuilder";
 import styles from "./RequestMemberView.module.css";
@@ -312,13 +313,14 @@ export function RequestMemberView() {
     return count === 1 && sample ? sample : `${count} ${t("member.orders")}`;
   }
 
-  // Render a request's line items each on their own row (shared by table + cards).
+  // Render a request's line items each on their own row, re-localized from the
+  // structured keys in the current locale (not the stored sender-locale string).
   function renderSummary(message: IMessage, fallback: string) {
     const payload = message.payload;
     const items = payload && "items" in payload ? payload.items : null;
     const lines =
       items && items.length > 0
-        ? items.map((l) => l.summary ?? "")
+        ? items.map((line) => localizeLine(line, catalog))
         : [fallback];
     return (
       <span className={styles.fdOrderSummary}>
