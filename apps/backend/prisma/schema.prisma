@@ -59,6 +59,7 @@ model UserPreference {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   itemKey   String
   options   Json
+  isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
 
   @@unique([userId, itemKey])

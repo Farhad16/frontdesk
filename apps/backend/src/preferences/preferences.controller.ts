@@ -22,7 +22,7 @@ export class PreferencesController {
     @Param('itemKey') itemKey: string,
     @Body() dto: SavePreferenceDto,
   ): Promise<IUserPreference> {
-    return this.preferences.save(user.id, itemKey, dto.options)
+    return this.preferences.save(user.id, itemKey, dto.options, dto.isDefault)
   }
 
   @Delete(':itemKey')

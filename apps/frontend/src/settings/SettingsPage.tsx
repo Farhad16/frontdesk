@@ -19,7 +19,7 @@ function preferenceSummary(options: Record<string, string | string[]>): string {
     if (key === 'addOns' && Array.isArray(value)) parts.push(...value)
     else if (typeof value === 'string') parts.push(t(`${key}.${value}`))
   })
-  return parts.join(', ')
+  return parts.join(' · ')
 }
 
 const NOTIF_OPTIONS: Array<{value: NotificationPref; labelKey: string}> = [
@@ -52,9 +52,9 @@ export function SettingsPage() {
     setPicking(false)
   }
 
-  function saveQuickPick(options: IUserPreference['options']) {
+  function saveQuickPick(options: IUserPreference['options'], isDefault: boolean) {
     if (!editorItem) return
-    void save(editorItem.key, options)
+    void save(editorItem.key, options, isDefault)
     setEditorItem(null)
   }
 
@@ -258,12 +258,20 @@ export function SettingsPage() {
               <QuickPickEditor
                 item={editorItem}
                 initialOptions={find(editorItem.key)?.options}
+                initialDefault={find(editorItem.key)?.isDefault}
                 addOnsLibrary={user.addOns}
                 onSave={saveQuickPick}
                 onCancel={() => setEditorItem(null)}
               />
             ) : picking ? (
               <>
+                <button
+                  type="button"
+                  className={styles.fdEditorBack}
+                  onClick={() => setPicking(false)}
+                >
+                  ‹ {t('settings.quickPicks')}
+                </button>
                 <span className={styles.fdEditorLabel}>{t('settings.chooseItem')}</span>
                 <div className={styles.fdChips}>
                   {catalog.map(item => (
@@ -294,8 +302,16 @@ export function SettingsPage() {
                       const item = catalog.find(c => c.key === pref.itemKey)
                       return (
                         <li key={pref.itemKey} className={styles.fdQuickPick}>
+                          <span className={styles.fdQuickPickEmoji} aria-hidden="true">
+                            {item?.emoji ?? '⭐'}
+                          </span>
                           <span className={styles.fdQuickPickText}>
-                            <span className={styles.fdQuickPickName}>{t(`item.${pref.itemKey}`)}</span>
+                            <span className={styles.fdQuickPickName}>
+                              {t(`item.${pref.itemKey}`)}
+                              {pref.isDefault && (
+                                <span className={styles.fdQuickPickStar}>{t('settings.default')}</span>
+                              )}
+                            </span>
                             <span className={styles.fdQuickPickSummary}>
                               {preferenceSummary(pref.options)}
                             </span>
@@ -311,6 +327,7 @@ export function SettingsPage() {
                           )}
                           <button
                             type="button"
+                            className={styles.fdQuickPickRemove}
                             aria-label={t('builder.remove')}
                             onClick={() => void remove(pref.itemKey)}
                           >

@@ -12,6 +12,7 @@ export class PreferencesService {
     return rows.map(row => ({
       itemKey: row.itemKey,
       options: row.options as IUserPreference['options'],
+      isDefault: row.isDefault,
     }))
   }
 
@@ -19,14 +20,22 @@ export class PreferencesService {
     userId: string,
     itemKey: string,
     options: IUserPreference['options'],
+    isDefault = false,
   ): Promise<IUserPreference> {
     const data = options as unknown as Prisma.InputJsonValue
+    // Only one default at a time.
+    if (isDefault) {
+      await this.prisma.userPreference.updateMany({
+        where: {userId, isDefault: true},
+        data: {isDefault: false},
+      })
+    }
     await this.prisma.userPreference.upsert({
       where: {userId_itemKey: {userId, itemKey}},
-      update: {options: data},
-      create: {userId, itemKey, options: data},
+      update: {options: data, isDefault},
+      create: {userId, itemKey, options: data, isDefault},
     })
-    return {itemKey, options}
+    return {itemKey, options, isDefault}
   }
 
   async remove(userId: string, itemKey: string): Promise<void> {

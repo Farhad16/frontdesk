@@ -281,8 +281,8 @@
 .fdQuickPicks {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--fd-space) * 0.5);
-  margin: 0;
+  gap: calc(var(--fd-space) * 0.75);
+  margin: 0 0 calc(var(--fd-space) * 1.5);
   padding: 0;
   list-style: none;
 }
@@ -290,30 +290,44 @@
 .fdQuickPick {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--fd-space);
-  padding: calc(var(--fd-space) * 0.75) var(--fd-space);
-  border-radius: var(--fd-radius);
-  background: var(--fd-surface);
+  padding: var(--fd-space) calc(var(--fd-space) * 1.25);
+  border: 1px solid color-mix(in srgb, var(--fd-border), var(--fd-bg) 40%);
+  border-radius: calc(var(--fd-radius) * 1.5);
+  background: var(--fd-bg);
+}
 
-  button {
-    flex-shrink: 0;
-    border: 0;
-    background: none;
-    color: color-mix(in srgb, var(--fd-text), transparent 30%);
-    cursor: pointer;
-  }
+.fdQuickPickEmoji {
+  display: flex;
+  width: calc(var(--fd-space) * 4.5);
+  height: calc(var(--fd-space) * 4.5);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--fd-surface);
+  font-size: calc(var(--fd-font) * 1.4);
 }
 
 .fdQuickPickText {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: calc(var(--fd-space) * 0.15);
+  gap: calc(var(--fd-space) * 0.2);
   min-width: 0;
 }
 
 .fdQuickPickName {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.5);
   font-size: var(--fd-font);
+  font-weight: 700;
+}
+
+.fdQuickPickStar {
+  color: #e0a92e;
+  font-size: calc(var(--fd-font) * 0.79);
   font-weight: 600;
 }
 
@@ -324,19 +338,63 @@
 
 .fdQuickPickEdit {
   flex-shrink: 0;
-  border: 0;
-  background: none;
+  padding: calc(var(--fd-space) * 0.4) var(--fd-space);
+  border: 1px solid var(--fd-border);
+  border-radius: var(--fd-radius);
+  background: var(--fd-bg);
   color: var(--fd-primary);
   font: inherit;
   font-size: calc(var(--fd-font) * 0.86);
   font-weight: 600;
   cursor: pointer;
+
+  &:hover {
+    background: var(--fd-surface);
+  }
+}
+
+.fdQuickPickRemove {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  color: color-mix(in srgb, var(--fd-text), transparent 35%);
+  font-size: var(--fd-font);
+  cursor: pointer;
+}
+
+.fdDefaultToggle {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fd-space) * 0.75);
+  font-size: calc(var(--fd-font) * 0.93);
+  cursor: pointer;
+}
+
+.fdReview {
+  padding: calc(var(--fd-space) * 0.85) var(--fd-space);
+  border-radius: var(--fd-radius);
+  background: var(--fd-surface);
+  color: color-mix(in srgb, var(--fd-text), transparent 15%);
+  font-size: calc(var(--fd-font) * 0.93);
+  font-style: italic;
 }
 
 .fdEditor {
   display: flex;
   flex-direction: column;
   gap: calc(var(--fd-space) * 1.5);
+}
+
+.fdEditorBack {
+  align-self: flex-start;
+  margin-bottom: calc(var(--fd-space) * 0.5);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fd-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .fdEditorHead {

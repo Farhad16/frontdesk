@@ -173,6 +173,9 @@ export const en = {
   'settings.newQuickPick': '＋ New quick pick',
   'settings.chooseItem': 'Choose an item',
   'settings.edit': 'Edit',
+  'settings.setDefault': '⭐ Set as default',
+  'settings.default': '★ default',
+  'settings.addOnsCount': 'My add-ons',
 } as const
 
 export type TranslationKey = keyof typeof en

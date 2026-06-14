@@ -16,10 +16,21 @@ export function usePreferences() {
     }
   }, [])
 
-  const save = useCallback(async (itemKey: string, options: IUserPreference['options']) => {
-    const saved = await apiClient.put<IUserPreference>(`/preferences/${itemKey}`, {options})
-    setPreferences(prev => [...prev.filter(p => p.itemKey !== itemKey), saved])
-  }, [])
+  const save = useCallback(
+    async (itemKey: string, options: IUserPreference['options'], isDefault = false) => {
+      const saved = await apiClient.put<IUserPreference>(`/preferences/${itemKey}`, {
+        options,
+        isDefault,
+      })
+      setPreferences(prev => {
+        const others = prev
+          .filter(p => p.itemKey !== itemKey)
+          .map(p => (isDefault ? {...p, isDefault: false} : p))
+        return [...others, saved]
+      })
+    },
+    [],
+  )
 
   const remove = useCallback(async (itemKey: string) => {
     await apiClient.delete(`/preferences/${itemKey}`)

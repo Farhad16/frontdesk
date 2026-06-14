@@ -173,4 +173,7 @@ export const bn: Partial<Record<string, string>> = {
   'settings.newQuickPick': '＋ নতুন কুইক পিক',
   'settings.chooseItem': 'একটি আইটেম বেছে নিন',
   'settings.edit': 'এডিট',
+  'settings.setDefault': '⭐ ডিফল্ট করুন',
+  'settings.default': '★ ডিফল্ট',
+  'settings.addOnsCount': 'আমার অ্যাড-অন',
 }

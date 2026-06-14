@@ -1,24 +1,28 @@
 import type {ICatalogItem, IUserPreference} from '@frontdesk/types'
 import {WuButton, WuInput} from '@npm-questionpro/wick-ui-lib'
 import {useMemo, useState} from 'react'
+import {buildLineSummary} from '../groups/builderSummary'
 import {t} from '../i18n'
 import styles from './SettingsPage.module.css'
 
 interface IQuickPickEditorProps {
   item: ICatalogItem
   initialOptions?: IUserPreference['options']
+  initialDefault?: boolean
   addOnsLibrary: string[]
-  onSave: (options: IUserPreference['options']) => void
+  onSave: (options: IUserPreference['options'], isDefault: boolean) => void
   onCancel: () => void
 }
 
 export function QuickPickEditor({
   item,
   initialOptions,
+  initialDefault,
   addOnsLibrary,
   onSave,
   onCancel,
 }: IQuickPickEditorProps) {
+  const [isDefault, setIsDefault] = useState(Boolean(initialDefault))
   const [selections, setSelections] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {}
     Object.entries(initialOptions ?? {}).forEach(([key, value]) => {
@@ -55,11 +59,16 @@ export function QuickPickEditor({
     if (!requiredMet) return
     const options: IUserPreference['options'] = {...selections}
     if (addOns.length > 0) options.addOns = addOns
-    onSave(options)
+    onSave(options, isDefault)
   }
+
+  const review = requiredMet ? buildLineSummary(item, selections, 1, addOns) : ''
 
   return (
     <div className={styles.fdEditor}>
+      <button type="button" className={styles.fdEditorBack} onClick={onCancel}>
+        ‹ {t('settings.quickPicks')}
+      </button>
       <div className={styles.fdEditorHead}>
         <span className={styles.fdEditorEmoji}>{item.emoji}</span>
         <span className={styles.fdEditorName}>{t(item.labelKey)}</span>
@@ -116,6 +125,13 @@ export function QuickPickEditor({
           </div>
         </div>
       )}
+
+      <label className={styles.fdDefaultToggle}>
+        <input type="checkbox" checked={isDefault} onChange={() => setIsDefault(v => !v)} />
+        {t('settings.setDefault')}
+      </label>
+
+      {review && <div className={styles.fdReview}>{review}</div>}
 
       <div className={styles.fdEditorActions}>
         <WuButton variant="primary" size="sm" disabled={!requiredMet} onClick={save}>

@@ -77,6 +77,7 @@ export interface ISignupInput {
 export interface IUserPreference {
   itemKey: string
   options: Record<string, string | string[]>
+  isDefault: boolean
 }
 export interface IOAuthProfile {
   email: string
