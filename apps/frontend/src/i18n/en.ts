@@ -179,6 +179,7 @@ export const en = {
   'settings.notifAll': 'Everything',
   'settings.notifStaffForced': 'Staff always receive notifications.',
   'settings.enableNotifications': 'Enable notifications',
+  'settings.syncNotifications': 'Re-enable notifications',
   'settings.notificationsEnabled': 'Notifications enabled',
   'settings.notificationsBlocked': 'Notifications blocked in browser settings.',
   'settings.addOns': 'My add-ons',

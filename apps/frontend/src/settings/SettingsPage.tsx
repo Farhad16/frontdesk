@@ -51,6 +51,8 @@ export function SettingsPage() {
   const catalogSections = useCatalog()
   const [addOnDraft, setAddOnDraft] = useState('')
   const [pushStatus, setPushStatus] = useState<PushStatus>(() => getPushStatus())
+  const [pushError, setPushError] = useState<string | null>(null)
+  const [pushBusy, setPushBusy] = useState(false)
   // Desktop shows nav + content side by side → open Profile by default.
   // Mobile shows one pane, so start on the section list.
   const [active, setActive] = useState<SectionKey | null>(() =>
@@ -140,7 +142,15 @@ export function SettingsPage() {
   ]
 
   async function handleEnablePush() {
-    setPushStatus(await enablePush())
+    setPushError(null)
+    setPushBusy(true)
+    try {
+      setPushStatus(await enablePush())
+    } catch (error) {
+      setPushError(error instanceof Error ? error.message : String(error))
+    } finally {
+      setPushBusy(false)
+    }
   }
 
   function changeLanguage(locale: Locale) {
@@ -297,16 +307,34 @@ export function SettingsPage() {
           {active === 'notifications' && (
             <>
               <div className={styles.fdPushRow}>
-                {pushStatus === 'granted' ? (
-                  <span className={styles.fdPushOn}>✓ {t('settings.notificationsEnabled')}</span>
-                ) : pushStatus === 'denied' ? (
+                {pushStatus === 'unsupported' ? (
                   <span className={styles.fdNote}>{t('settings.notificationsBlocked')}</span>
-                ) : pushStatus === 'unsupported' ? null : (
-                  <WuButton variant="primary" size="sm" onClick={handleEnablePush}>
-                    {t('settings.enableNotifications')}
-                  </WuButton>
+                ) : (
+                  <>
+                    {pushStatus === 'granted' && (
+                      <span className={styles.fdPushOn}>
+                        ✓ {t('settings.notificationsEnabled')}
+                      </span>
+                    )}
+                    {pushStatus === 'denied' && (
+                      <span className={styles.fdNote}>{t('settings.notificationsBlocked')}</span>
+                    )}
+                    {pushStatus !== 'denied' && (
+                      <WuButton
+                        variant="primary"
+                        size="sm"
+                        loading={pushBusy}
+                        onClick={handleEnablePush}
+                      >
+                        {pushStatus === 'granted'
+                          ? t('settings.syncNotifications')
+                          : t('settings.enableNotifications')}
+                      </WuButton>
+                    )}
+                  </>
                 )}
               </div>
+              {pushError && <p className={styles.fdNote}>⚠ {pushError}</p>}
               {isStaff ? (
                 <p className={styles.fdNote}>{t('settings.notifStaffForced')}</p>
               ) : (

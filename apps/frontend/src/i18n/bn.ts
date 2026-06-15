@@ -180,6 +180,7 @@ export const bn: Partial<Record<string, string>> = {
   'settings.notifAll': 'সবকিছু',
   'settings.notifStaffForced': 'স্টাফরা সবসময় নোটিফিকেশন পান।',
   'settings.enableNotifications': 'নোটিফিকেশন চালু করুন',
+  'settings.syncNotifications': 'নোটিফিকেশন পুনরায় চালু',
   'settings.notificationsEnabled': 'নোটিফিকেশন চালু আছে',
   'settings.notificationsBlocked': 'ব্রাউজার সেটিংসে নোটিফিকেশন বন্ধ আছে।',
   'settings.addOns': 'আমার অ্যাড-অন',
