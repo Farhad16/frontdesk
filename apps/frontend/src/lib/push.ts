@@ -18,12 +18,7 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return output
 }
 
-export async function enablePush(): Promise<PushStatus> {
-  if (getPushStatus() === 'unsupported') return 'unsupported'
-
-  const permission = await Notification.requestPermission()
-  if (permission !== 'granted') return permission as PushStatus
-
+async function subscribeAndStore(): Promise<void> {
   const registration = await navigator.serviceWorker.ready
   const {publicKey} = await apiClient.get<{publicKey: string}>('/push/key')
 
@@ -40,6 +35,26 @@ export async function enablePush(): Promise<PushStatus> {
     endpoint: subscription.endpoint,
     keys: {p256dh: json.keys?.p256dh, auth: json.keys?.auth},
   })
+}
 
+export async function enablePush(): Promise<PushStatus> {
+  if (getPushStatus() === 'unsupported') return 'unsupported'
+
+  const permission = await Notification.requestPermission()
+  if (permission !== 'granted') return permission as PushStatus
+
+  await subscribeAndStore()
   return 'granted'
+}
+
+// Silently re-register the subscription on app load when permission is already
+// granted. Push endpoints rotate/expire; without this a stale endpoint stops
+// delivering until the user revisits Settings. Never prompts; swallows errors.
+export async function resubscribePush(): Promise<void> {
+  if (getPushStatus() !== 'granted') return
+  try {
+    await subscribeAndStore()
+  } catch {
+    // Best-effort: offline, SW not ready, or transient API error. Settings can retry.
+  }
 }

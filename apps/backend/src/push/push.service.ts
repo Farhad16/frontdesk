@@ -36,10 +36,15 @@ export class PushService {
     })
   }
 
-  async notifyNewMessage(senderId: string, groupKey: string, message: IMessage): Promise<void> {
+  async notifyNewMessage(
+    senderId: string,
+    groupKey: string,
+    message: IMessage,
+    opts: {requireInteraction?: boolean} = {},
+  ): Promise<void> {
     const subs = await this.subscriptionsExcept(senderId)
     const targets = subs.filter(sub => wantsNewMessage(effectivePref(sub.user)))
-    await this.dispatch(targets, message, groupKey)
+    await this.dispatch(targets, message, groupKey, opts)
   }
 
   async notifyOwnerUpdate(
@@ -64,12 +69,18 @@ export class PushService {
     })
   }
 
-  private async dispatch(targets: SubWithUser[], message: IMessage, groupKey: string): Promise<void> {
+  private async dispatch(
+    targets: SubWithUser[],
+    message: IMessage,
+    groupKey: string,
+    opts: {requireInteraction?: boolean} = {},
+  ): Promise<void> {
     if (!this.enabled || targets.length === 0) return
     const payload = JSON.stringify({
       title: message.sender.name,
       body: message.summary ?? message.text ?? '',
       url: `/groups/${groupKey}`,
+      requireInteraction: opts.requireInteraction ?? false,
     })
     await Promise.all(
       targets.map(sub =>

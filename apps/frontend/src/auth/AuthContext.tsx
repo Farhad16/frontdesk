@@ -1,6 +1,7 @@
 import type {ICurrentUser, ILoginInput, ISignupInput} from '@frontdesk/types'
 import {createContext, useCallback, useContext, useEffect, useState, type ReactNode} from 'react'
 import {apiClient} from '../lib/apiClient'
+import {resubscribePush} from '../lib/push'
 
 interface IAuthContext {
   user: ICurrentUser | null
@@ -24,6 +25,12 @@ export function AuthProvider({children}: {children: ReactNode}) {
       .catch(() => setUser(null))
       .finally(() => setLoading(false))
   }, [])
+
+  // Self-heal the push subscription whenever a user is active (login or restored
+  // session). Silent — only acts if notification permission is already granted.
+  useEffect(() => {
+    if (user) void resubscribePush()
+  }, [user])
 
   const login = useCallback(async (input: ILoginInput) => {
     setUser(await apiClient.post<ICurrentUser>('/auth/login', input))

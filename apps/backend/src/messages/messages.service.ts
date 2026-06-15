@@ -122,7 +122,8 @@ export class MessagesService {
     })
     const mapped = toMessage(message)
     this.events.emit({type: 'message:new', groupKey, message: mapped})
-    void this.push.notifyNewMessage(senderId, groupKey, mapped)
+    // Sticky push: a new request should stay on staff's screen until acted on.
+    void this.push.notifyNewMessage(senderId, groupKey, mapped, {requireInteraction: true})
     return mapped
   }
 

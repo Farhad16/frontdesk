@@ -20,6 +20,8 @@ interface IPushPayload {
   title?: string
   body?: string
   url?: string
+  icon?: string
+  requireInteraction?: boolean
 }
 
 self.addEventListener('push', event => {
@@ -27,8 +29,10 @@ self.addEventListener('push', event => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'Frontdesk', {
       body: data.body ?? '',
-      icon: '/icons/icon-192.png',
+      icon: data.icon ?? '/icons/icon-192.png',
       badge: '/icons/icon-192.png',
+      // Sticky for new requests so staff don't miss them; auto-dismiss otherwise.
+      requireInteraction: data.requireInteraction ?? false,
       data: {url: data.url ?? '/'},
     }),
   )
